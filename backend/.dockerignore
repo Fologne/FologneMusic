@@ -1,0 +1,9 @@
+**
+!manage.py
+!requirements.txt
+!requirements-production.txt
+!config/
+!config/*.py
+!core/
+!core/*.py
+core/test*.py

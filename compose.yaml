@@ -1,0 +1,21 @@
+services:
+  django:
+    build: ./backend
+    command: [python, manage.py, runserver, 0.0.0.0:8000]
+    environment:
+      DJANGO_DEBUG: "true"
+      DJANGO_ALLOWED_HOSTS: "${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1,10.0.2.2}"
+      DJANGO_DB_PATH: /data/db.sqlite3
+    ports:
+      - "${FOLOGNE_BIND:-127.0.0.1}:${FOLOGNE_PORT:-8000}:8000"
+    volumes:
+      - ./backend/core:/app/core:ro
+      - ./backend/config:/app/config:ro
+      - django-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/', timeout=2).close()"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+volumes:
+  django-data:

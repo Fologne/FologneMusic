@@ -1,0 +1,65 @@
+{
+  "ado": {
+    "usseewa": {
+      "kind": "artist_commentary",
+      "text": "Ado descreve a faixa como uma expressão de raiva. Para ela, a combinação do tema com uma interpretação vocal áspera era incomum na época.",
+      "language": "pt-BR",
+      "source": {
+        "name": "The Guardian",
+        "title": "Entrevista com Ado",
+        "url": "https://www.theguardian.com/music/2024/mar/11/ado-platinum-selling-pop-star-secret-identity-troxy-london",
+        "offline_allowed": true
+      }
+    },
+    "うっせぇわ": {
+      "kind": "artist_commentary",
+      "text": "Ado descreve a faixa como uma expressão de raiva. Para ela, a combinação do tema com uma interpretação vocal áspera era incomum na época.",
+      "language": "pt-BR",
+      "source": {
+        "name": "The Guardian",
+        "title": "Entrevista com Ado",
+        "url": "https://www.theguardian.com/music/2024/mar/11/ado-platinum-selling-pop-star-secret-identity-troxy-london",
+        "offline_allowed": true
+      }
+    }
+  },
+  "sabaton": {
+    "the red baron": {
+      "kind": "artist_commentary",
+      "text": "A banda se inspirou em Manfred von Richthofen, piloto alemão da Primeira Guerra Mundial. O apelido Barão Vermelho veio da cor de seu avião. A faixa evoca a velocidade dos combates aéreos e a fama que o piloto conquistou.",
+      "language": "pt-BR",
+      "source": {
+        "name": "Sabaton",
+        "title": "The Great War — comentário sobre The Red Baron",
+        "url": "https://www.sabaton.net/discography/the-great-war/",
+        "offline_allowed": true
+      }
+    }
+  },
+  "arcticmonkeys": {
+    "505": {
+      "kind": "artist_commentary",
+      "text": "Alex Turner descreveu 505 como uma canção de amor sobre a pressa de reencontrar alguém num quarto de hotel em Nova York. A viagem dá forma à expectativa desse reencontro.",
+      "language": "pt-BR",
+      "source": {
+        "name": "NME",
+        "title": "Entrevista com Arctic Monkeys de 2007",
+        "url": "https://www.nme.com/blogs/nme-blogs/arctic-monkeys-nme-interview-2007-favourite-worst-nightmare-2307701",
+        "offline_allowed": true
+      }
+    }
+  },
+  "orangerange": {
+    "asterisk": {
+      "kind": "editorial_context",
+      "text": "A letra usa a luz das estrelas como imagem do que atravessa o tempo e ainda alcança outras pessoas. Uma leitura é que sentimentos e gestos podem inspirar alguém muito depois de acontecerem. O asterisco do título lembra uma pequena estrela, e a faixa foi a primeira abertura de Bleach.",
+      "language": "pt-BR",
+      "source": {
+        "name": "Real Sound",
+        "title": "Conversa sobre Asterisk com NAOTO e JABBA DA FOOTBALL CLUB",
+        "url": "https://realsound.jp/2021/02/post-707602.html",
+        "offline_allowed": true
+      }
+    }
+  }
+}

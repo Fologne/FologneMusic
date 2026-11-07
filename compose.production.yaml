@@ -1,0 +1,27 @@
+services:
+  django:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DJANGO_SECRET_KEY_FILE: /run/secrets/django_key
+      DJANGO_ALLOWED_HOSTS: "${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}"
+      DJANGO_DB_PATH: /data/db.sqlite3
+      DJANGO_REQUIRE_HTTPS: "${DJANGO_REQUIRE_HTTPS:-false}"
+      DJANGO_TRUST_PROXY: "${DJANGO_TRUST_PROXY:-false}"
+      MUSICAPP_USER_AGENT: "${MUSICAPP_USER_AGENT:-FologneMusic/1.0.0 (https://github.com/Fologne/RhapsodyMusic)}"
+    ports:
+      - "127.0.0.1:${FOLOGNE_PORT:-8000}:8000"
+    volumes:
+      - django-data:/data
+    secrets:
+      - django_key
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8000/api/v1/health/', headers={'X-Forwarded-Proto':'https'}), timeout=2).close()"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+secrets:
+  django_key:
+    file: "${FOLOGNE_DJANGO_SECRET_FILE:?informe o caminho do arquivo de chave Django}"
+volumes:
+  django-data:
