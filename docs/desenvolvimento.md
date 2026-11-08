@@ -56,6 +56,27 @@ Com a configuração acima, as buscas passam pelo Django local via USB. No app, 
 
 ## Verificações
 
+### Protótipo de download de áudio
+
+O fluxo de MP3 é experimental e exige Android 10 ou superior em ARM64 ou x86-64. A compilação padrão mantém o recebimento do link. Para compilar a variante de teste, baixe o arquivo `yt-dlp` da versão fixada e habilite a integração antes do build. O Gradle verifica o SHA-256 do arquivo. [yt-dlp 2026.10.26](https://github.com/yt-dlp/yt-dlp/releases/tag/2026.10.26).
+
+```powershell
+$env:FOLOGNE_EXPERIMENTAL_DOWNLOADS = 'true'
+$env:FOLOGNE_YTDLP_ZIPAPP = 'C:/caminho/yt-dlp'
+cd mobile
+flutter build apk --debug
+```
+
+Essa variante de debug usa o identificador `com.musicapp.music_app.qa`. Para o teste integrado, sirva um WAV de teste como `fologne-test.wav` em uma porta local e encaminhe essa porta para o emulador com `adb reverse`. Execute o comando abaixo a partir de `mobile`.
+
+```powershell
+flutter test integration_test/audio_download_test.dart -d emulator-5554 --dart-define=FOLOGNE_AUDIO_FIXTURE_URL=http://127.0.0.1:18791/fologne-test.wav
+```
+
+O servidor local serve apenas o arquivo de teste. O APK processa links compartilhados no Android, com yt-dlp, Python, QuickJS e FFmpeg empacotados. Quando o extrator precisar de atualização, revise a versão, o SHA-256 e o marcador em `AudioDownloads.kt`, recompilando o APK. A distribuição pública do protótipo depende da revisão das licenças dos componentes empacotados. [youtubedl-android](https://github.com/yausername/youtubedl-android).
+
+### Verificações de rotina
+
 Backend, a partir da raiz:
 
 ```powershell

@@ -148,16 +148,24 @@ class MusicHandler extends BaseAudioHandler {
   @override
   Future<void> seek(Duration position) => _guard(() => engine.seek(position));
   @override
-  Future<void> skipToNext() => _guard(() async {
-    if (engine.hasNext) await engine.seekToNext();
-  });
+  Future<void> skipToNext() => _skip(1);
   @override
-  Future<void> skipToPrevious() => _guard(() async {
-    if (engine.position.inSeconds > 3) {
-      await engine.seek(Duration.zero);
-    } else if (engine.hasPrevious) {
-      await engine.seekToPrevious();
-    }
+  Future<void> skipToPrevious() => _skip(-1);
+
+  Future<void> _skip(int offset) => _guard(() async {
+    final indices = engine.effectiveIndices;
+    final currentIndex = engine.currentIndex;
+    if (currentIndex == null || indices.length < 2) return;
+
+    final position = indices.indexOf(currentIndex);
+    if (position < 0) return;
+
+    // Manual skips follow the queue even when the current track repeats.
+    var target = position + offset;
+    if (engine.loopMode == LoopMode.all) target %= indices.length;
+    if (target < 0 || target >= indices.length) return;
+
+    await engine.seek(Duration.zero, index: indices[target]);
   });
   @override
   Future<void> skipToQueueItem(int index) => _guard(() async {

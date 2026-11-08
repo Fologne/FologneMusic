@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../library/music_controller.dart';
+import 'common.dart';
 
 Future<String?> playlistNameDialog(
   BuildContext context, {
@@ -132,6 +133,8 @@ Future<void> pickPlaylistTracks(
                         final track = tracks[index];
                         final exists = playlist.trackIds.contains(track.id);
                         return CheckboxListTile(
+                          secondary: CoverArt(track: track, size: 44),
+                          controlAffinity: ListTileControlAffinity.trailing,
                           title: Text(
                             track.title,
                             maxLines: 1,

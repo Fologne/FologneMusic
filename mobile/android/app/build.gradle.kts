@@ -1,3 +1,5 @@
+import java.security.MessageDigest
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
@@ -6,11 +8,44 @@ plugins {
 
 val releaseKeystore = providers.environmentVariable("FOLOGNE_KEYSTORE")
 val releasePassword = providers.environmentVariable("FOLOGNE_KEYSTORE_PASSWORD")
+val experimentalDownloads = providers.environmentVariable("FOLOGNE_EXPERIMENTAL_DOWNLOADS").orNull == "true"
+
+if (experimentalDownloads) {
+    val zipapp = file(providers.environmentVariable("FOLOGNE_YTDLP_ZIPAPP").get())
+    check(zipapp.isFile) { "FOLOGNE_YTDLP_ZIPAPP precisa apontar para um arquivo." }
+    val stagedAssets = layout.buildDirectory.dir("experimental-download-assets")
+    val stageExtractor = tasks.register<Copy>("stageDownloadExtractor") {
+        from(zipapp)
+        into(stagedAssets)
+        rename { "fologne-yt-dlp" }
+        doFirst {
+            val sha256 = MessageDigest.getInstance("SHA-256")
+                .digest(zipapp.readBytes()).joinToString("") { "%02x".format(it) }
+            check(sha256 == "e51e69e89489f199530f13d32a4342da3ddb2cf34842f364603a066db05afbf3") {
+                "Use o zipapp oficial yt-dlp 2026.10.26."
+            }
+        }
+    }
+    tasks.matching { it.name == "preBuild" }.configureEach { dependsOn(stageExtractor) }
+    android.sourceSets.named("main") { assets.srcDir(stagedAssets.get().asFile) }
+    dependencies {
+        implementation("io.github.junkfood02.youtubedl-android:library:0.18.1")
+        implementation("io.github.junkfood02.youtubedl-android:ffmpeg:0.18.1")
+    }
+}
 
 android {
     namespace = "com.musicapp.music_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+    sourceSets.named("main") {
+        java.srcDir(if (experimentalDownloads) "src/downloads/kotlin" else "src/noDownloads/kotlin")
+    }
+    if (experimentalDownloads) {
+        packaging.jniLibs.useLegacyPackaging = true
+        packaging.jniLibs.keepDebugSymbols += setOf("**/libffmpeg.zip.so", "**/libpython.zip.so")
+        packaging.jniLibs.excludes += setOf("**/armeabi-v7a/**", "**/x86/**")
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -44,8 +79,16 @@ android {
         }
     }
     buildTypes {
+        if (experimentalDownloads) {
+            debug {
+                applicationIdSuffix = ".qa"
+            }
+        }
         release {
             signingConfig = signingConfigs.getByName("release")
+            if (experimentalDownloads) {
+                proguardFile("proguard-downloads.pro")
+            }
         }
     }
 }

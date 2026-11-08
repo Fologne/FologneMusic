@@ -1,4 +1,21 @@
-# FologneMusic 1.0.0
+# Entrega do FologneMusic
+
+## Versão 2.0.0
+
+O APK `FologneMusic-2.0.0.apk` usa o identificador `com.musicapp.music_app`, a chave da versão 1.0.0 e o código de versão 15. A aba **Downloads** usa a mesma fila para links compartilhados e colados. O histórico de downloads fica em um arquivo local separado do SQLite da biblioteca. Limpar o histórico mantém os MP3 salvos em `Music/FologneMusic`.
+
+O download de áudio funciona a partir do Android 10 em ARM64 ou x86-64. No emulador, o teste do APK assinado da rc.3 baixou o áudio de um vídeo autorizado, converteu para MP3 e abriu a faixa no player. [Configuração da compilação com downloads](desenvolvimento.md#protótipo-de-download-de-áudio).
+
+### Componentes do APK experimental
+
+| Componente | Evidência para a revisão |
+| --- | --- |
+| youtubedl-android 0.18.1 | O artefato Android declara GPL-3.0. [Metadados no Maven Central](https://central.sonatype.com/artifact/io.github.junkfood02.youtubedl-android/library/0.18.1) |
+| FFmpeg do pacote 0.18.1 | Os binários ARM64 e x86-64 incluem as opções `--enable-gpl` e `--enable-version3`. A distribuição precisa da fonte que corresponde aos binários e das instruções de compilação. [Licenciamento do FFmpeg](https://ffmpeg.org/legal.html) |
+| Zipapp yt-dlp 2026.10.26 | Inclui yt-dlp sob Unlicense, além de componentes com licenças ISC e MIT. [Licenças no README da versão](https://github.com/yt-dlp/yt-dlp/blob/2026.10.26/README.md#licensing) |
+| Python, QuickJS e bibliotecas transitivas | Conferir os avisos e o código-fonte correspondentes à compilação empacotada antes da publicação. [Projeto youtubedl-android](https://github.com/yausername/youtubedl-android) |
+
+Antes de disponibilizar o APK experimental ao público, falta definir a licença do FologneMusic, reunir os avisos e identificar o código-fonte correspondente a todas as bibliotecas distribuídas.
 
 ## Instalar e usar no celular
 

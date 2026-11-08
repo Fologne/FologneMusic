@@ -10,6 +10,7 @@ class Track {
     required this.durationMs,
     required this.folder,
     required this.addedAt,
+    this.createdAt,
     this.available = true,
   });
   final String id;
@@ -19,6 +20,7 @@ class Track {
   final int durationMs;
   final String folder;
   final int addedAt;
+  final int? createdAt;
   final bool available;
   int get seconds => durationMs ~/ 1000;
   Color get color => const Color(0xFF437CA1);
@@ -32,6 +34,7 @@ class Track {
     durationMs: (json['durationMs'] as num).toInt(),
     folder: json['folder'] as String,
     addedAt: (json['addedAt'] as num).toInt(),
+    createdAt: (json['createdAt'] as num?)?.toInt(),
     available: json['available'] as bool? ?? true,
   );
   Map<String, dynamic> toJson() => {
@@ -42,6 +45,7 @@ class Track {
     'durationMs': durationMs,
     'folder': folder,
     'addedAt': addedAt,
+    'createdAt': createdAt,
     'available': available,
   };
   Track missing() => Track.fromJson({...toJson(), 'available': false});

@@ -242,6 +242,19 @@ class MusicController extends ChangeNotifier {
     }
   }
 
+  Future<bool> deleteFromDevice(Track track) async {
+    if (byId(track.id)?.available != true || !await media.delete(track.id)) {
+      return false;
+    }
+    await refreshAfterMediaChange();
+    return true;
+  }
+
+  Future<void> refreshAfterMediaChange() async {
+    await _activeRefresh;
+    await refresh();
+  }
+
   List<Track> filtered(String query, {List<Track>? from}) {
     final term = query.toLowerCase();
     final key = (allTracks, sort, term);
@@ -430,6 +443,18 @@ class MusicController extends ChangeNotifier {
     history.clear();
     _notify();
     await save();
+  }
+
+  List<Track> get recentlyAdded {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final cutoff = now - const Duration(days: 90).inMilliseconds;
+    return allTracks.where((track) {
+      final createdAt = track.createdAt;
+      return track.available &&
+          createdAt != null &&
+          createdAt >= cutoff &&
+          createdAt <= now;
+    }).toList()..sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
   }
 
   List<Track> get recent {

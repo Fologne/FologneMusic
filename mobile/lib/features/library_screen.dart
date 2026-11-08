@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../core/app_info.dart';
 import '../core/theme.dart';
+import '../library/audio_download_queue.dart';
 import '../library/music_controller.dart';
 import '../widgets/common.dart';
 import '../widgets/playlist_actions.dart';
+import 'audio_downloads_screen.dart';
 import 'player_screen.dart';
 import 'settings_screen.dart';
 
 class LibraryScreen extends StatefulWidget {
-  const LibraryScreen({super.key});
+  const LibraryScreen({super.key, this.audioQueue});
+  final AudioDownloadQueue? audioQueue;
   @override
   State<LibraryScreen> createState() => _LibraryScreenState();
 }
@@ -264,7 +267,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
     final filtered = state.filtered(query);
     final tracks = state.tracks;
     return DefaultTabController(
-      length: 5,
+      length: widget.audioQueue == null ? 5 : 6,
       initialIndex: 1,
       child: Scaffold(
         body: AppBackground(
@@ -275,6 +278,17 @@ class _LibraryScreenState extends State<LibraryScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 8, 8, 8),
                   child: Row(
                     children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.asset(
+                          'android/app/src/main/res/drawable-nodpi/fologne_launcher_art.png',
+                          width: 32,
+                          height: 32,
+                          fit: BoxFit.cover,
+                          excludeFromSemantics: true,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
                       const Expanded(
                         child: Text(
                           appName,
@@ -343,15 +357,16 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       onChanged: (value) => setState(() => query = value),
                     ),
                   ),
-                const TabBar(
+                TabBar(
                   isScrollable: true,
-                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   tabs: [
-                    Tab(text: 'Para você'),
-                    Tab(text: 'Faixas'),
-                    Tab(text: 'Playlists'),
-                    Tab(text: 'Pastas'),
-                    Tab(text: 'Álbuns'),
+                    const Tab(text: 'Para você'),
+                    const Tab(text: 'Faixas'),
+                    const Tab(text: 'Playlists'),
+                    const Tab(text: 'Pastas'),
+                    const Tab(text: 'Álbuns'),
+                    if (widget.audioQueue != null) const Tab(text: 'Downloads'),
                   ],
                 ),
                 if (state.loading) const LinearProgressIndicator(minHeight: 2),
@@ -375,182 +390,176 @@ class _LibraryScreenState extends State<LibraryScreen> {
                     ),
                   ),
                 Expanded(
-                  child: !state.permitted && !state.loading
-                      ? _refreshList(state, [
-                          Notice(
-                            icon: Icons.library_music_outlined,
-                            title: 'Sua música começa aqui',
-                            message: 'Permita o acesso aos arquivos de áudio para encontrar as músicas do celular. Seus arquivos não serão enviados ao servidor.',
-                            action: Column(
-                              children: [
-                                FilledButton(
-                                  onPressed: () => state.refresh(request: true),
-                                  child: const Text('Permitir acesso ao áudio'),
-                                ),
-                                TextButton(
-                                  onPressed: state.media.openSettings,
-                                  child: const Text(
-                                    'Abrir permissões do aplicativo',
+                  child: TabBarView(
+                    children: [
+                      if (!state.permitted && !state.loading)
+                        for (var index = 0; index < 5; index++)
+                          _refreshList(state, [
+                            Notice(
+                              icon: Icons.library_music_outlined,
+                              title: 'Sua música começa aqui',
+                              message: 'Permita o acesso aos arquivos de áudio para encontrar as músicas do celular. Seus arquivos não serão enviados ao servidor.',
+                              action: Column(
+                                children: [
+                                  FilledButton(
+                                    onPressed: () =>
+                                        state.refresh(request: true),
+                                    child: const Text(
+                                      'Permitir acesso ao áudio',
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  TextButton(
+                                    onPressed: state.media.openSettings,
+                                    child: const Text(
+                                      'Abrir permissões do aplicativo',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ])
+                      else ...[
+                        _refreshList(state, [
+                          const Text(
+                            'NO SEU RITMO',
+                            style: TextStyle(
+                              letterSpacing: 2,
+                              fontSize: 11,
+                              color: AppColors.accent,
                             ),
                           ),
-                        ])
-                      : TabBarView(
-                          children: [
-                            _refreshList(state, [
-                              const Text(
-                                'NO SEU RITMO',
-                                style: TextStyle(
-                                  letterSpacing: 2,
-                                  fontSize: 11,
-                                  color: AppColors.accent,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'Sua música.\nSempre por perto.',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineLarge,
-                              ),
-                              const SizedBox(height: 12),
-                              const Text(
-                                'Ouça seus arquivos, mesmo sem internet.',
-                                style: TextStyle(color: AppColors.muted),
-                              ),
-                              const SectionTitle('Sua atividade'),
-                              collection(
-                                'Meus favoritos',
-                                'favorites',
-                                tracks
-                                    .where(
-                                      (t) => state.favorites.contains(t.id),
-                                    )
-                                    .length,
-                                Icons.favorite_border,
-                              ),
-                              collection(
-                                'Reproduzidas recentemente',
-                                'recent',
-                                state.recent.length,
-                                Icons.history,
-                              ),
-                              collection(
-                                'Mais ouvidas',
-                                'most',
-                                state.mostPlayed.length,
-                                Icons.equalizer,
-                              ),
-                              if (state.history.isEmpty)
-                                const Text(
-                                  'Seu histórico aparece após ouvir 30 segundos ou metade de uma música curta.',
-                                  style: TextStyle(color: AppColors.muted),
-                                ),
-                            ], padding: const EdgeInsets.all(24)),
-                            _trackPage(state, filtered),
-                            _refreshList(state, [
-                              const SectionTitle('Sua coleção'),
-                              collection(
-                                'Meus favoritos',
-                                'favorites',
-                                tracks
-                                    .where(
-                                      (t) => state.favorites.contains(t.id),
-                                    )
-                                    .length,
-                                Icons.favorite_border,
-                              ),
-                              collection(
-                                'Adicionadas recentemente',
-                                'added',
-                                tracks.length,
-                                Icons.library_add_outlined,
-                              ),
-                              collection(
-                                'Reproduzidas recentemente',
-                                'recent',
-                                state.recent.length,
-                                Icons.history,
-                              ),
-                              collection(
-                                'Mais ouvidas',
-                                'most',
-                                state.mostPlayed.length,
-                                Icons.equalizer,
-                              ),
-                              SectionTitle(
-                                'Minhas playlists',
-                                trailing: IconButton(
-                                  tooltip: 'Criar playlist',
-                                  onPressed: () async {
-                                    final name = await playlistNameDialog(
-                                      context,
-                                    );
-                                    if (name != null) {
-                                      await state.createPlaylist(name);
-                                    }
-                                  },
-                                  icon: const Icon(Icons.add),
-                                ),
-                              ),
-                              if (state.playlists.isEmpty)
-                                const Text(
-                                  'Crie uma playlist para organizar suas músicas.',
-                                  style: TextStyle(color: AppColors.muted),
-                                ),
-                              for (final playlist in state.playlists)
-                                collection(
-                                  playlist.name,
-                                  'playlist',
-                                  playlist.trackIds.length,
-                                  Icons.queue_music,
-                                  playlist.id,
-                                ),
-                            ], padding: const EdgeInsets.all(24)),
-                            _refreshList(state, [
-                              const SectionTitle('Suas pastas'),
-                              for (final folder
-                                  in tracks
-                                      .map((t) => t.folder)
-                                      .toSet()
-                                      .toList()
-                                    ..sort())
-                                collection(
-                                  folder,
-                                  'folder',
-                                  tracks
-                                      .where((t) => t.folder == folder)
-                                      .length,
-                                  Icons.folder_outlined,
-                                  folder,
-                                ),
-                            ], padding: const EdgeInsets.all(24)),
-                            _refreshList(state, [
-                              const SectionTitle('Seus álbuns'),
-                              for (final album
-                                  in tracks
-                                      .map((t) => '${t.album}\u0000${t.artist}')
-                                      .toSet()
-                                      .toList()
-                                    ..sort())
-                                collection(
-                                  album.split('\u0000').first,
-                                  'album',
-                                  tracks
-                                      .where(
-                                        (t) =>
-                                            '${t.album}\u0000${t.artist}' ==
-                                            album,
-                                      )
-                                      .length,
-                                  Icons.album_outlined,
-                                  album,
-                                ),
-                            ], padding: const EdgeInsets.all(24)),
-                          ],
-                        ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Sua música.\nSempre por perto.',
+                            style: Theme.of(context).textTheme.headlineLarge,
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'Ouça seus arquivos, mesmo sem internet.',
+                            style: TextStyle(color: AppColors.muted),
+                          ),
+                          const SectionTitle('Sua atividade'),
+                          collection(
+                            'Meus favoritos',
+                            'favorites',
+                            tracks
+                                .where((t) => state.favorites.contains(t.id))
+                                .length,
+                            Icons.favorite_border,
+                          ),
+                          collection(
+                            'Reproduzidas recentemente',
+                            'recent',
+                            state.recent.length,
+                            Icons.history,
+                          ),
+                          collection(
+                            'Mais ouvidas',
+                            'most',
+                            state.mostPlayed.length,
+                            Icons.equalizer,
+                          ),
+                          if (state.history.isEmpty)
+                            const Text(
+                              'Seu histórico aparece após ouvir 30 segundos ou metade de uma música curta.',
+                              style: TextStyle(color: AppColors.muted),
+                            ),
+                        ], padding: const EdgeInsets.all(24)),
+                        _trackPage(state, filtered),
+                        _refreshList(state, [
+                          const SectionTitle('Sua coleção'),
+                          collection(
+                            'Meus favoritos',
+                            'favorites',
+                            tracks
+                                .where((t) => state.favorites.contains(t.id))
+                                .length,
+                            Icons.favorite_border,
+                          ),
+                          collection(
+                            'Adicionadas recentemente',
+                            'added',
+                            state.recentlyAdded.length,
+                            Icons.library_add_outlined,
+                          ),
+                          collection(
+                            'Reproduzidas recentemente',
+                            'recent',
+                            state.recent.length,
+                            Icons.history,
+                          ),
+                          collection(
+                            'Mais ouvidas',
+                            'most',
+                            state.mostPlayed.length,
+                            Icons.equalizer,
+                          ),
+                          SectionTitle(
+                            'Minhas playlists',
+                            trailing: IconButton(
+                              tooltip: 'Criar playlist',
+                              onPressed: () async {
+                                final name = await playlistNameDialog(context);
+                                if (name != null) {
+                                  await state.createPlaylist(name);
+                                }
+                              },
+                              icon: const Icon(Icons.add),
+                            ),
+                          ),
+                          if (state.playlists.isEmpty)
+                            const Text(
+                              'Crie uma playlist para organizar suas músicas.',
+                              style: TextStyle(color: AppColors.muted),
+                            ),
+                          for (final playlist in state.playlists)
+                            collection(
+                              playlist.name,
+                              'playlist',
+                              playlist.trackIds.length,
+                              Icons.queue_music,
+                              playlist.id,
+                            ),
+                        ], padding: const EdgeInsets.all(24)),
+                        _refreshList(state, [
+                          const SectionTitle('Suas pastas'),
+                          for (final folder
+                              in tracks.map((t) => t.folder).toSet().toList()
+                                ..sort())
+                            collection(
+                              folder,
+                              'folder',
+                              tracks.where((t) => t.folder == folder).length,
+                              Icons.folder_outlined,
+                              folder,
+                            ),
+                        ], padding: const EdgeInsets.all(24)),
+                        _refreshList(state, [
+                          const SectionTitle('Seus álbuns'),
+                          for (final album
+                              in tracks
+                                  .map((t) => '${t.album}\u0000${t.artist}')
+                                  .toSet()
+                                  .toList()
+                                ..sort())
+                            collection(
+                              album.split('\u0000').first,
+                              'album',
+                              tracks
+                                  .where(
+                                    (t) =>
+                                        '${t.album}\u0000${t.artist}' == album,
+                                  )
+                                  .length,
+                              Icons.album_outlined,
+                              album,
+                            ),
+                        ], padding: const EdgeInsets.all(24)),
+                      ],
+                      if (widget.audioQueue case final queue?)
+                        AudioDownloadsScreen(queue: queue),
+                    ],
+                  ),
                 ),
                 const MiniPlayer(),
               ],
@@ -632,7 +641,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
         state.tracks.where((t) => state.favorites.contains(t.id)).toList(),
       'recent' => state.recent,
       'most' => state.mostPlayed,
-      'added' => state.tracks..sort((a, b) => b.addedAt.compareTo(a.addedAt)),
+      'added' => state.recentlyAdded,
       'folder' => state.tracks.where((t) => t.folder == widget.value).toList(),
       'album' =>
         state.tracks
@@ -791,10 +800,12 @@ class _CollectionScreenState extends State<CollectionScreen> {
                             ],
                           ),
                           if (all.isEmpty)
-                            const Notice(
+                            Notice(
                               icon: Icons.queue_music,
                               title: 'Ainda sem músicas',
-                              message: 'Adicione músicas ou ouça sua biblioteca para preencher esta lista.',
+                              message: widget.kind == 'added'
+                                  ? 'Nenhum arquivo de áudio dos últimos 90 dias.'
+                                  : 'Adicione músicas ou ouça sua biblioteca para preencher esta lista.',
                             ),
                         ],
                       ),
@@ -803,6 +814,13 @@ class _CollectionScreenState extends State<CollectionScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       sliver: SliverReorderableList(
                         itemCount: tracks.length,
+                        proxyDecorator: (child, _, _) => Material(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          clipBehavior: Clip.antiAlias,
+                          elevation: 4,
+                          child: child,
+                        ),
                         onReorderItem: (from, to) {
                           if (canReorder) {
                             state.reorderPlaylist(playlist, from, to);

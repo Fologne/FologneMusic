@@ -1,7 +1,7 @@
 name: music_app
 description: Player Android com letras e significados offline.
 publish_to: none
-version: 1.0.0+8
+version: 2.0.0+15
 
 environment:
   sdk: ^3.13.7
@@ -29,3 +29,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/track_context.json
+    - android/app/src/main/res/drawable-nodpi/fologne_launcher_art.png

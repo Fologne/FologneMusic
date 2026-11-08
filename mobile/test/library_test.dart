@@ -5,6 +5,27 @@ import 'support/fakes.dart';
 
 void main() {
   test(
+    'exclusão cancelada preserva a faixa e confirmação atualiza a fila',
+    () async {
+      final media = FakeMedia()..allowDelete = false;
+      final state = MusicController(
+        media: media,
+        store: MemoryStore(),
+        handler: FakeHandler(),
+      );
+      addTearDown(state.dispose);
+      await state.initialize();
+      await state.select(testTracks.first, from: testTracks);
+      expect(await state.deleteFromDevice(testTracks.first), isFalse);
+      expect(state.tracks, hasLength(2));
+      media.allowDelete = true;
+      expect(await state.deleteFromDevice(testTracks.first), isTrue);
+      expect(state.tracks.single.id, testTracks.last.id);
+      expect(state.queue.single.id, testTracks.last.id);
+    },
+  );
+
+  test(
     'restaura playlists, favoritos, ordem e posição sem tocar automaticamente',
     () async {
       final store = MemoryStore();

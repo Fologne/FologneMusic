@@ -29,6 +29,7 @@ const testTracks = [
 class FakeMedia implements MediaLibrary {
   bool allowed = true;
   bool failScan = false;
+  bool allowDelete = true;
   List<Track> rows = List.of(testTracks);
   @override
   Future<bool> permission({bool request = false}) async => allowed;
@@ -40,6 +41,13 @@ class FakeMedia implements MediaLibrary {
 
   @override
   Future<void> openSettings() async {}
+
+  @override
+  Future<bool> delete(String id) async {
+    if (!allowDelete) return false;
+    rows = rows.where((track) => track.id != id).toList();
+    return true;
+  }
 }
 
 class MemoryStore implements MusicStore {

@@ -249,6 +249,42 @@ String musicCount(int count) => '$count ${count == 1 ? 'música' : 'músicas'}';
 String durationLabel(num seconds) =>
     '${seconds ~/ 60}:${(seconds.toInt() % 60).toString().padLeft(2, '0')}';
 
+Future<void> _deleteTrack(
+  BuildContext context,
+  MusicController state,
+  Track track,
+) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Apagar do celular?'),
+      content: Text('O arquivo “${track.title}” será apagado permanentemente.'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: const Text('Apagar'),
+        ),
+      ],
+    ),
+  );
+  if (confirmed != true || !context.mounted) return;
+  String message;
+  try {
+    if (!await state.deleteFromDevice(track)) return;
+    message = 'Música apagada do celular.';
+  } catch (_) {
+    message = 'Não foi possível apagar o arquivo.';
+  }
+  if (context.mounted) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
 class TrackTile extends StatelessWidget {
   const TrackTile({
     super.key,
@@ -292,6 +328,7 @@ class TrackTile extends StatelessWidget {
             onSelected: (value) {
               if (value == 'favorite') state.toggleFavorite(track);
               if (value == 'playlist') addTracksToPlaylist(context, [track]);
+              if (value == 'delete') _deleteTrack(context, state, track);
               if (value == 'info') {
                 showDialog<void>(
                   context: context,
@@ -324,6 +361,11 @@ class TrackTile extends StatelessWidget {
                 child: Text('Adicionar à playlist'),
               ),
               const PopupMenuItem(value: 'info', child: Text('Informações')),
+              if (track.available)
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Text('Apagar do celular'),
+                ),
             ],
           ),
     );

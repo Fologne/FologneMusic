@@ -1,6 +1,7 @@
 *
 !.gitignore
 !README.md
+!README.en.md
 !ICONAPP.jpg
 !compose.yaml
 !compose.production.yaml
@@ -46,6 +47,7 @@
 !mobile/android/gradle/wrapper/gradle-wrapper.properties
 !mobile/android/app/
 !mobile/android/app/*.kts
+!mobile/android/app/proguard-downloads.pro
 !mobile/android/app/src/
 !mobile/android/app/src/**/
 !mobile/android/app/src/**/*.xml
