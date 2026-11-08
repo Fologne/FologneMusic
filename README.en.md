@@ -51,3 +51,7 @@ The following guides are in Portuguese.
 - [Lyrics and meaning sources](docs/fontes.md)
 - [Content API](docs/api-conteudo.md)
 - [Installation, signing and Docker](docs/entrega.md)
+
+## License
+
+The original FologneMusic code is distributed under the GNU General Public License, version 3 (`GPL-3.0-only`). Third-party components retain their own licenses. [License text](LICENSE) · [Component licenses and sources](docs/entrega.md#licenças-e-código-fonte)

@@ -20,6 +20,8 @@ O download de áudio funciona a partir do Android 10 em ARM64 ou x86-64. No emul
 
 ### Licenças e código-fonte
 
+O código original do FologneMusic é distribuído sob `GPL-3.0-only`. [Texto da licença](../LICENSE)
+
 Os binários nativos do APK correspondem byte a byte aos incluídos nos AARs 0.18.1 para as duas arquiteturas. O zipapp principal de yt-dlp tem o SHA-256 fixado no Gradle. A biblioteca também inclui uma cópia de yt-dlp como recurso interno.
 
 | Componente | Licença e fonte identificadas |
@@ -31,7 +33,7 @@ Os binários nativos do APK correspondem byte a byte aos incluídos nos AARs 0.1
 
 As receitas do Termux no commit `8ddd9a7fc8e06330545487d81bb7591cb40f1aa6` são uma referência para FFmpeg 7.1.1 e suas dependências. Os guias da biblioteca descrevem o processo geral, mas não fixam todas as revisões, os patches e as instruções usadas nos binários Android 0.18.1. A correspondência completa das fontes de FFmpeg, Python, QuickJS e das bibliotecas empacotadas ainda precisa ser confirmada para ARM64 e x86-64. [Receitas do Termux](https://github.com/termux/termux-packages/tree/8ddd9a7fc8e06330545487d81bb7591cb40f1aa6/packages) · [Levantamento do mesmo pacote pelo Sieve](https://github.com/Massivemiike/sieve-android/blob/e8467a8691dcdaf8aa5b26056ca5b2f3e7a10e76/licenses/FFMPEG_SOURCE.txt#L93)
 
-Antes de publicar o APK com Downloads, o titular precisa definir a licença do FologneMusic. Também faltam reunir os avisos aplicáveis e oferecer o código-fonte correspondente aos componentes sob GPL, com as versões, os patches e as instruções de compilação. Na distribuição pela internet, o acesso à fonte deve ser equivalente ao acesso ao APK e as notas da release devem indicar onde obtê-la. [FAQ da GPL](https://www.gnu.org/licenses/gpl-faq.en.html#SourceAndBinaryOnDifferentSites) · [Licenciamento do FFmpeg](https://ffmpeg.org/legal.html)
+Antes de publicar o APK com Downloads, faltam reunir os avisos aplicáveis e oferecer o código-fonte correspondente aos componentes sob GPL, com as versões, os patches e as instruções de compilação. Na distribuição pela internet, o acesso à fonte deve ser equivalente ao acesso ao APK e as notas da release devem indicar onde obtê-la. [FAQ da GPL](https://www.gnu.org/licenses/gpl-faq.en.html#SourceAndBinaryOnDifferentSites) · [Licenciamento do FFmpeg](https://ffmpeg.org/legal.html)
 
 ### Rascunho no GitHub
 

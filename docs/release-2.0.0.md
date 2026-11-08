@@ -15,4 +15,4 @@ SHA-256 do APK
 1f4c38a151fa3823a0c6fbe14d29ee500afe53e2a236870fecc77d741a10b37d
 ```
 
-[Componentes, licenças e instruções de compilação](https://github.com/Fologne/FologneMusic/blob/v2.0.0/docs/entrega.md#licenças-e-código-fonte)
+O código original do FologneMusic está sob `GPL-3.0-only`. [Texto da licença](https://github.com/Fologne/FologneMusic/blob/v2.0.0/LICENSE) · [Componentes, licenças e instruções de compilação](https://github.com/Fologne/FologneMusic/blob/v2.0.0/docs/entrega.md#licenças-e-código-fonte)

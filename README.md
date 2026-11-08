@@ -49,3 +49,7 @@ Quando houver autorização para download, toque em **Salvar offline**. Gerencie
 - [Fontes de letras e significados](docs/fontes.md)
 - [API de letras e significados](docs/api-conteudo.md)
 - [Instalação, assinatura e Docker](docs/entrega.md)
+
+## Licença
+
+O código original do FologneMusic é distribuído sob a GNU General Public License, versão 3 (`GPL-3.0-only`). Os componentes de terceiros mantêm suas próprias licenças. [Texto da licença](LICENSE) · [Licenças e fontes dos componentes](docs/entrega.md#licenças-e-código-fonte)
