@@ -6,16 +6,40 @@ O APK `FologneMusic-2.0.0.apk` usa o identificador `com.musicapp.music_app`, a c
 
 O download de áudio funciona a partir do Android 10 em ARM64 ou x86-64. No emulador, o teste do APK assinado da rc.3 baixou o áudio de um vídeo autorizado, converteu para MP3 e abriu a faixa no player. [Configuração da compilação com downloads](desenvolvimento.md#protótipo-de-download-de-áudio).
 
-### Componentes do APK experimental
+### Arquivo e verificação
 
-| Componente | Evidência para a revisão |
+| Item | Valor |
 | --- | --- |
-| youtubedl-android 0.18.1 | O artefato Android declara GPL-3.0. [Metadados no Maven Central](https://central.sonatype.com/artifact/io.github.junkfood02.youtubedl-android/library/0.18.1) |
-| FFmpeg do pacote 0.18.1 | Os binários ARM64 e x86-64 incluem as opções `--enable-gpl` e `--enable-version3`. A distribuição precisa da fonte que corresponde aos binários e das instruções de compilação. [Licenciamento do FFmpeg](https://ffmpeg.org/legal.html) |
-| Zipapp yt-dlp 2026.10.26 | Inclui yt-dlp sob Unlicense, além de componentes com licenças ISC e MIT. [Licenças no README da versão](https://github.com/yt-dlp/yt-dlp/blob/2026.10.26/README.md#licensing) |
-| Python, QuickJS e bibliotecas transitivas | Conferir os avisos e o código-fonte correspondentes à compilação empacotada antes da publicação. [Projeto youtubedl-android](https://github.com/yausername/youtubedl-android) |
+| APK | `FologneMusic-2.0.0.apk` |
+| Tamanho | 128.459.077 bytes |
+| SHA-256 do APK | `1f4c38a151fa3823a0c6fbe14d29ee500afe53e2a236870fecc77d741a10b37d` |
+| SHA-256 do certificado | `f2921d73b8caa843456b9fb36efae838e27723135d7e556a1f57f66eaf7a9a21` |
+| Código do app usado no build | `6d4d47234ee45928d32e0b1f55b8c54a743ef0dc` |
+| SDK | Android 7.0 para o player e Android 10 para download e conversão |
+| ABIs | `arm64-v8a` e `x86_64` |
 
-Antes de disponibilizar o APK experimental ao público, falta definir a licença do FologneMusic, reunir os avisos e identificar o código-fonte correspondente a todas as bibliotecas distribuídas.
+### Licenças e código-fonte
+
+Os binários nativos do APK correspondem byte a byte aos incluídos nos AARs 0.18.1 para as duas arquiteturas. O zipapp principal de yt-dlp tem o SHA-256 fixado no Gradle. A biblioteca também inclui uma cópia de yt-dlp como recurso interno.
+
+| Componente | Licença e fonte identificadas |
+| --- | --- |
+| youtubedl-android 0.18.1 | GPL-3.0 declarada no Maven Central. A tag aponta para `d725d5c9a18c3a99a13ee0308bf78275dc310760`. Há arquivos `sources.jar` para [library](https://repo.maven.apache.org/maven2/io/github/junkfood02/youtubedl-android/library/0.18.1/library-0.18.1-sources.jar), [common](https://repo.maven.apache.org/maven2/io/github/junkfood02/youtubedl-android/common/0.18.1/common-0.18.1-sources.jar) e [ffmpeg](https://repo.maven.apache.org/maven2/io/github/junkfood02/youtubedl-android/ffmpeg/0.18.1/ffmpeg-0.18.1-sources.jar). [Tag da biblioteca](https://github.com/yausername/youtubedl-android/tree/0.18.1) |
+| FFmpeg e FFprobe 7.1.1 | A configuração dos binários inclui `--enable-gpl` e `--enable-version3`. O pacote também contém as bibliotecas que eles carregam. [Atualização dos binários](https://github.com/yausername/youtubedl-android/commit/f2280ae7d8bc8d59590c8727a89f047983867c10) · [Fonte base 7.1.1](https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz) · [Instruções da biblioteca](https://github.com/yausername/youtubedl-android/blob/0.18.1/BUILD_FFMPEG.md) |
+| CPython 3.12.11 e QuickJS 2025-04-26 | A fonte base do CPython inclui a licença da PSF. QuickJS usa MIT. O pacote Python também inclui mutagen 1.47.0 (GPL-2.0-or-later), pycryptodomex 3.23.0 e bibliotecas nativas como GNU Readline. [CPython](https://www.python.org/downloads/release/python-31211/) · [QuickJS](https://bellard.org/quickjs/) · [Instruções da biblioteca](https://github.com/yausername/youtubedl-android/blob/0.18.1/BUILD_PYTHON.md) |
+| yt-dlp e yt-dlp-ejs | O app usa o zipapp 2026.10.26 com EJS 0.8.0. O recurso interno da biblioteca contém yt-dlp 2025.11.12 com EJS 0.3.1. yt-dlp usa Unlicense e os zipapps incluem código ISC e MIT. [Licenças da versão usada pelo app](https://github.com/yt-dlp/yt-dlp/blob/2026.10.26/THIRD_PARTY_LICENSES.txt) · [Licenças da versão interna](https://github.com/yt-dlp/yt-dlp/blob/2025.11.12/THIRD_PARTY_LICENSES.txt) |
+
+As receitas do Termux no commit `8ddd9a7fc8e06330545487d81bb7591cb40f1aa6` são uma referência para FFmpeg 7.1.1 e suas dependências. Os guias da biblioteca descrevem o processo geral, mas não fixam todas as revisões, os patches e as instruções usadas nos binários Android 0.18.1. A correspondência completa das fontes de FFmpeg, Python, QuickJS e das bibliotecas empacotadas ainda precisa ser confirmada para ARM64 e x86-64. [Receitas do Termux](https://github.com/termux/termux-packages/tree/8ddd9a7fc8e06330545487d81bb7591cb40f1aa6/packages) · [Levantamento do mesmo pacote pelo Sieve](https://github.com/Massivemiike/sieve-android/blob/e8467a8691dcdaf8aa5b26056ca5b2f3e7a10e76/licenses/FFMPEG_SOURCE.txt#L93)
+
+Antes de publicar o APK com Downloads, o titular precisa definir a licença do FologneMusic. Também faltam reunir os avisos aplicáveis e oferecer o código-fonte correspondente aos componentes sob GPL, com as versões, os patches e as instruções de compilação. Na distribuição pela internet, o acesso à fonte deve ser equivalente ao acesso ao APK e as notas da release devem indicar onde obtê-la. [FAQ da GPL](https://www.gnu.org/licenses/gpl-faq.en.html#SourceAndBinaryOnDifferentSites) · [Licenciamento do FFmpeg](https://ffmpeg.org/legal.html)
+
+### Rascunho no GitHub
+
+1. Inclua a documentação no commit e envie-o para a branch `master`.
+2. Abra [Releases do FologneMusic](https://github.com/Fologne/FologneMusic/releases) e selecione **Draft a new release**.
+3. Use a tag `v2.0.0`, o título `FologneMusic 2.0.0` e a branch `master` com a documentação atualizada. Cole as [notas da versão](release-2.0.0.md).
+4. Anexe `FologneMusic-2.0.0.apk` em **Assets**. No computador onde o APK foi gerado, o arquivo está em `D:/FologneMusicBuild/apk/FologneMusic-2.0.0.apk`.
+5. Salve com **Save draft**. Publique após concluir a seção de licenças e disponibilizar as fontes correspondentes. [Instruções do GitHub](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository#creating-a-release)
 
 ## Instalar e usar no celular
 
@@ -32,11 +56,12 @@ Use a mesma chave de release em todas as futuras versões deste aplicativo. Nest
 Defina `FOLOGNE_KEYSTORE` com o caminho da chave e `FOLOGNE_KEYSTORE_PASSWORD` no ambiente de build. O alias é `folognemusic`. A partir de `mobile`, execute:
 
 ```powershell
-flutter pub get
-flutter build apk --release
+$env:FOLOGNE_EXPERIMENTAL_DOWNLOADS = 'true'
+$env:FOLOGNE_YTDLP_ZIPAPP = 'C:/caminho/yt-dlp'
+flutter build apk --release --target-platform android-arm64,android-x64
 ```
 
-O APK fica em `build/app/outputs/flutter-apk/app-release.apk`. Use o `apksigner verify --print-certs` do SDK Android para conferir o certificado e calcule o SHA-256 do APK antes de distribuí-lo.
+A versão 2.0.0 foi compilada com Flutter 3.47.8. Use o arquivo `yt-dlp` da [release 2026.10.26](https://github.com/yt-dlp/yt-dlp/releases/tag/2026.10.26). O APK fica em `build/app/outputs/flutter-apk/app-release.apk`. Use `apksigner verify --print-certs` do SDK Android para conferir o certificado e `Get-FileHash -Algorithm SHA256` para calcular o SHA-256.
 
 O modo direto dispensa a configuração de URL. Se você já opera um Django em HTTPS, pode informar o endereço em **Menu → Configurações → Busca de textos → Usar servidor Django**. Para usar um servidor desde a primeira abertura, informe `--dart-define=API_BASE_URL=https://seu-dominio` no build.
 

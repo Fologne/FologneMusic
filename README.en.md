@@ -8,7 +8,7 @@ An Android player for music stored on your phone, built with Flutter. Lyrics and
 
 Requires Android 7.0 or later.
 
-1. Open [Releases](https://github.com/Fologne/RhapsodyMusic/releases) and download `FologneMusic-2.0.0.apk` under **Assets** for version 2.0.0.
+1. Open [Releases](https://github.com/Fologne/FologneMusic/releases). Once version 2.0.0 is published, download `FologneMusic-2.0.0.apk` under **Assets**.
 2. Open the APK from **Downloads** in your Android file manager. If Android asks, allow installation from that file manager and confirm.
 3. Open FologneMusic and grant audio access. The app loads the music that Android has indexed on your device.
 

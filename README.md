@@ -8,7 +8,7 @@ Player de músicas locais para Android, feito em Flutter. A busca de letras e si
 
 Requer Android 7.0 ou superior.
 
-1. Abra a página de [Releases](https://github.com/Fologne/RhapsodyMusic/releases) e baixe `FologneMusic-2.0.0.apk` em **Assets** da versão 2.0.0.
+1. Abra a página de [Releases](https://github.com/Fologne/FologneMusic/releases). Quando a 2.0.0 estiver publicada, baixe `FologneMusic-2.0.0.apk` em **Assets**.
 2. Abra o APK em **Downloads** pelo gerenciador de arquivos do Android. Se o sistema solicitar, autorize a instalação a partir desse gerenciador e confirme.
 3. Abra o FologneMusic e conceda acesso ao áudio. O app carrega as músicas armazenadas no celular que o Android já catalogou.
 
