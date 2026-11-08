@@ -49,9 +49,15 @@ void main() {
     expect(state.position, greaterThanOrEqualTo(4));
     debugPrint('Seek validado');
     await state.toggleShuffle();
+    final shuffled = state.playbackQueue.map((track) => track.id).toList();
+    expect(shuffled.first, state.current!.id);
+    await state.skip(1);
+    expect(state.current!.id, shuffled[1]);
     final expectedRepeat = (state.repeat + 1) % 3;
     await state.cycleRepeat();
     await state.reorder(0, tracks.length - 1);
+    final reordered = [...shuffled.skip(1), shuffled.first];
+    expect(state.playbackQueue.map((track) => track.id), reordered);
     expect(state.shuffle, isTrue);
     expect(state.repeat, expectedRepeat);
     await state.togglePlaying();
@@ -86,6 +92,7 @@ void main() {
     expect(restored.playing, isFalse);
     expect(restored.position, closeTo(savedPosition, 1));
     expect(restored.favorites, contains(tracks.first.id));
+    expect(restored.playbackQueue.map((track) => track.id), reordered);
     debugPrint('Sessão restaurada');
     await tester.pumpWidget(app.MusicApp(controller: restored));
     await tester.pumpAndSettle();

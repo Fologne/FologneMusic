@@ -19,6 +19,7 @@ Para atualizar, abra o APK de uma versão mais recente sobre a instalação exis
 - Biblioteca por faixas, pastas e álbuns, com busca por título, artista ou álbum, ordenação e índice alfabético.
 - Atualização da biblioteca ao abrir o app, voltar a ele ou puxar a lista para baixo. Também há um botão para atualizar.
 - Reprodução local em segundo plano, miniplayer, fila editável, avanço na faixa, modo aleatório e repetição. Os botões **Anterior** e **Próxima** seguem a fila com um toque.
+- A fila mostra a ordem real de reprodução no modo aleatório e restaura essa ordem ao reabrir o app.
 - Controles na notificação e na tela bloqueada, com capa nas cores originais e botão X para parar a reprodução. O sistema define a cor do cartão.
 - Restauração da fila e da posição ao reabrir, com início da reprodução sob comando do usuário.
 - Criação e edição de playlists, com seleção múltipla de faixas na ordem dos toques, capas no seletor, reordenação por arraste com destaque em azul-marinho e capa escolhida entre as músicas da lista.

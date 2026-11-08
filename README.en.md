@@ -19,6 +19,7 @@ To update, install a newer APK over the existing app. Android preserves app data
 - Browse tracks, folders and albums. Search by title, artist or album, sort tracks or jump to a letter.
 - Refresh the library when opening or returning to the app, by pulling down the list or by tapping the refresh button.
 - Play local files in the background with a mini player, editable queue, seeking, shuffle and repeat. **Previous** and **Next** move through the queue with one tap.
+- The queue shows the actual playback order in shuffle mode and restores that order when you reopen the app.
 - Control playback from the notification and lock screen, with original track artwork and an X button to stop. Android chooses the card's color.
 - Restore your previous queue and playback position when you reopen the app. Press play to resume.
 - Create and edit playlists, add tracks in selection order, see covers in the picker, drag to reorder with a navy highlight, and choose a cover from the playlist.

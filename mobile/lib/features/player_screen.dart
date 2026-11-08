@@ -412,6 +412,7 @@ void openQueue(BuildContext context) => showModalBottomSheet<void>(
   isScrollControlled: true,
   builder: (context) {
     final state = MusicScope.of(context);
+    final tracks = state.playbackQueue;
     return SafeArea(
       child: SizedBox(
         height: MediaQuery.sizeOf(context).height * .65,
@@ -441,11 +442,11 @@ void openQueue(BuildContext context) => showModalBottomSheet<void>(
             Expanded(
               child: ReorderableListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-                itemCount: state.queue.length,
+                itemCount: tracks.length,
                 onReorderItem: state.reorder,
                 buildDefaultDragHandles: false,
                 itemBuilder: (context, index) {
-                  final track = state.queue[index];
+                  final track = tracks[index];
                   return TrackTile(
                     key: ValueKey(track.id),
                     track: track,

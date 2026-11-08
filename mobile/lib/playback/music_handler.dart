@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../library/models.dart';
@@ -9,6 +10,7 @@ import '../library/media_library.dart';
 
 class MusicHandler extends BaseAudioHandler {
   final engine = AudioPlayer(maxSkipsOnError: 5);
+  final _shuffleOrder = _PlaybackShuffleOrder();
   Future<void> _pending = Future.value();
   Timer? _sleepTimer;
   int _artworkRequest = 0;
@@ -22,6 +24,16 @@ class MusicHandler extends BaseAudioHandler {
       }
     });
     engine.currentIndexStream.listen((_) => _syncItem());
+    engine.sequenceStateStream.listen((state) {
+      final order = state.shuffleModeEnabled
+          ? state.effectiveSequence
+                .map((source) => (source.tag as MediaItem).id)
+                .toList()
+          : null;
+      if (!listEquals(order, customState.valueOrNull as List<String>?)) {
+        customState.add(order);
+      }
+    });
     engine.durationStream.listen((duration) {
       final item = mediaItem.value;
       if (item != null && duration != null) {
@@ -125,7 +137,10 @@ class MusicHandler extends BaseAudioHandler {
   Future<void> play() => _guard(() async {
     if (queue.value.isEmpty) return;
     if (engine.processingState == ProcessingState.completed) {
-      await engine.seek(Duration.zero, index: 0);
+      await engine.seek(
+        Duration.zero,
+        index: engine.effectiveIndices.firstOrNull,
+      );
     }
     unawaited(
       engine.play().catchError((Object error) {
@@ -247,12 +262,27 @@ class MusicHandler extends BaseAudioHandler {
               milliseconds: extras['positionMs'] as int? ?? 0,
             ),
             preload: extras['play'] == true,
+            shuffleOrder: _shuffleOrder,
           );
-          await setShuffleMode(
-            extras['shuffle'] == true
-                ? AudioServiceShuffleMode.all
-                : AudioServiceShuffleMode.none,
-          );
+          final shuffle = extras['shuffle'] == true;
+          if (shuffle) {
+            final savedOrder = (extras['playbackOrder'] as List?)
+                ?.whereType<String>();
+            final indicesById = {
+              for (final (i, track) in tracks.indexed) track.id: i,
+            };
+            final restoredOrder = savedOrder
+                ?.map((id) => indicesById[id])
+                .whereType<int>()
+                .toSet();
+            _shuffleOrder.next =
+                restoredOrder != null && restoredOrder.length == tracks.length
+                ? restoredOrder.toList()
+                : null;
+            await engine.shuffle();
+          }
+          await engine.setShuffleModeEnabled(shuffle);
+          _broadcast();
           if (extras['play'] == true) await play();
         } else if (name == 'reorder') {
           final from = extras!['from'] as int;
@@ -262,6 +292,14 @@ class MusicHandler extends BaseAudioHandler {
               from >= items.length ||
               to < 0 ||
               to >= items.length) {
+            return;
+          }
+          if (engine.shuffleModeEnabled) {
+            final order = List<int>.of(engine.effectiveIndices);
+            if (order.length != items.length) return;
+            order.insert(to, order.removeAt(from));
+            _shuffleOrder.next = order;
+            await engine.shuffle();
             return;
           }
           items.insert(to, items.removeAt(from));
@@ -274,5 +312,22 @@ class MusicHandler extends BaseAudioHandler {
     _pending = task;
     await task;
     return null;
+  }
+}
+
+class _PlaybackShuffleOrder extends DefaultShuffleOrder {
+  List<int>? next;
+
+  @override
+  void shuffle({int? initialIndex}) {
+    final order = next;
+    next = null;
+    if (order == null) {
+      super.shuffle(initialIndex: initialIndex);
+    } else {
+      indices
+        ..clear()
+        ..addAll(order);
+    }
   }
 }

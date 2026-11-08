@@ -74,6 +74,15 @@ class MusicController extends ChangeNotifier {
       .map((item) => byId(item.id))
       .whereType<Track>()
       .toList();
+  List<Track> get playbackQueue {
+    final tracks = queue;
+    final order = handler.customState.valueOrNull;
+    if (order is! List<String> || order.length != tracks.length) return tracks;
+    final byId = {for (final track in tracks) track.id: track};
+    if (order.any((id) => !byId.containsKey(id))) return tracks;
+    return order.map((id) => byId[id]!).toList();
+  }
+
   bool get playing => handler.playbackState.value.playing;
   bool get buffering => {
     AudioProcessingState.loading,
@@ -137,6 +146,7 @@ class MusicController extends ChangeNotifier {
       }),
     );
     _subscriptions.add(handler.queue.listen((_) => _notify()));
+    _subscriptions.add(handler.customState.listen((_) => _notify()));
     _subscriptions.add(
       handler.customEvent.listen((event) {
         if (event is Map && event['error'] is String) {
@@ -214,6 +224,7 @@ class MusicController extends ChangeNotifier {
                 : 0,
             'play': false,
             'shuffle': _saved['shuffle'] == true,
+            'playbackOrder': _saved['playbackOrder'],
           });
           await handler.setRepeatMode(
             _repeatMode((_saved['repeat'] as num? ?? 0).toInt()),
@@ -230,6 +241,7 @@ class MusicController extends ChangeNotifier {
           'positionMs': index >= 0 ? (position * 1000).toInt() : 0,
           'play': false,
           'shuffle': shuffle,
+          'playbackOrder': handler.customState.valueOrNull,
         });
         error = 'A fila foi atualizada: há arquivos que não estão mais disponíveis.';
       }
@@ -367,7 +379,9 @@ class MusicController extends ChangeNotifier {
   }
 
   Future<void> selectInQueue(Track track) async {
-    await handler.skipToQueueItem(queue.indexWhere((t) => t.id == track.id));
+    await handler.skipToQueueItem(
+      handler.queue.value.indexWhere((item) => item.id == track.id),
+    );
     await handler.play();
     await save();
   }
@@ -518,6 +532,9 @@ class MusicController extends ChangeNotifier {
             ? (position * 1000).toInt()
             : _saved['positionMs'] ?? 0,
         'shuffle': _queueRestored ? shuffle : _saved['shuffle'] ?? false,
+        'playbackOrder': _queueRestored
+            ? handler.customState.valueOrNull
+            : _saved['playbackOrder'],
         'repeat': _queueRestored ? repeat : _saved['repeat'] ?? 0,
       }),
     ) as Map<String, dynamic>;

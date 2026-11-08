@@ -2,7 +2,7 @@
 
 ## Versão 2.0.0
 
-O APK `FologneMusic-2.0.0.apk` usa o identificador `com.musicapp.music_app`, a chave da versão 1.0.0 e o código de versão 15. A aba **Downloads** usa a mesma fila para links compartilhados e colados. O histórico de downloads fica em um arquivo local separado do SQLite da biblioteca. Limpar o histórico mantém os MP3 salvos em `Music/FologneMusic`.
+O APK `FologneMusic-2.0.0.apk` usa o identificador `com.musicapp.music_app`, a chave da versão 1.0.0 e o código de versão 16. A fila de reprodução mostra a ordem do modo aleatório e restaura essa ordem ao reabrir o app. A aba **Downloads** usa a mesma fila para links compartilhados e colados. Seu histórico fica separado do SQLite da biblioteca. Limpar o histórico mantém os MP3 salvos em `Music/FologneMusic`.
 
 O download de áudio funciona a partir do Android 10 em ARM64 ou x86-64. No emulador, o teste do APK assinado da rc.3 baixou o áudio de um vídeo autorizado, converteu para MP3 e abriu a faixa no player. [Configuração da compilação com downloads](desenvolvimento.md#protótipo-de-download-de-áudio).
 
@@ -11,10 +11,10 @@ O download de áudio funciona a partir do Android 10 em ARM64 ou x86-64. No emul
 | Item | Valor |
 | --- | --- |
 | APK | `FologneMusic-2.0.0.apk` |
-| Tamanho | 128.459.077 bytes |
-| SHA-256 do APK | `1f4c38a151fa3823a0c6fbe14d29ee500afe53e2a236870fecc77d741a10b37d` |
+| Tamanho | 128.478.945 bytes |
+| SHA-256 do APK | `5b6af1c691826f912094249a65f21eb1a203b0771169d3801a808614e13a6628` |
 | SHA-256 do certificado | `f2921d73b8caa843456b9fb36efae838e27723135d7e556a1f57f66eaf7a9a21` |
-| Código do app usado no build | `6d4d47234ee45928d32e0b1f55b8c54a743ef0dc` |
+| Código do app usado no build | Base `f90d0acd4b158e19e04464810ac8e0fc10ca4a4c` com a correção da fila incluída no pacote de fontes |
 | SDK | Android 7.0 para o player e Android 10 para download e conversão |
 | ABIs | `arm64-v8a` e `x86_64` |
 
@@ -33,15 +33,15 @@ Os binários nativos do APK correspondem byte a byte aos incluídos nos AARs 0.1
 
 As receitas do Termux no commit `8ddd9a7fc8e06330545487d81bb7591cb40f1aa6` são uma referência para FFmpeg 7.1.1 e suas dependências. Os guias da biblioteca descrevem o processo geral, mas não fixam todas as revisões, os patches e as instruções usadas nos binários Android 0.18.1. A correspondência completa das fontes de FFmpeg, Python, QuickJS e das bibliotecas empacotadas ainda precisa ser confirmada para ARM64 e x86-64. [Receitas do Termux](https://github.com/termux/termux-packages/tree/8ddd9a7fc8e06330545487d81bb7591cb40f1aa6/packages) · [Levantamento do mesmo pacote pelo Sieve](https://github.com/Massivemiike/sieve-android/blob/e8467a8691dcdaf8aa5b26056ca5b2f3e7a10e76/licenses/FFMPEG_SOURCE.txt#L93)
 
-Antes de publicar o APK com Downloads, faltam reunir os avisos aplicáveis e oferecer o código-fonte correspondente aos componentes sob GPL, com as versões, os patches e as instruções de compilação. Na distribuição pela internet, o acesso à fonte deve ser equivalente ao acesso ao APK e as notas da release devem indicar onde obtê-la. [FAQ da GPL](https://www.gnu.org/licenses/gpl-faq.en.html#SourceAndBinaryOnDifferentSites) · [Licenciamento do FFmpeg](https://ffmpeg.org/legal.html)
+O pacote `FologneMusic-2.0.0-fontes-e-avisos.zip` reúne as fontes obtidas, os avisos presentes nos arquivos de origem e no próprio APK, os hashes dos binários e as receitas de referência. O manifesto `FONTES.json` identifica as fontes obtidas e os endereços pendentes. Antes de publicar o APK com Downloads, confirme a correspondência dos binários pendentes e complete os avisos aplicáveis. Na distribuição pela internet, o acesso à fonte deve ser equivalente ao acesso ao APK e as notas da release devem indicar onde obtê-la. [FAQ da GPL](https://www.gnu.org/licenses/gpl-faq.en.html#SourceAndBinaryOnDifferentSites) · [Licenciamento do FFmpeg](https://ffmpeg.org/legal.html)
 
 ### Rascunho no GitHub
 
 1. Inclua a documentação no commit e envie-o para a branch `master`.
 2. Abra [Releases do FologneMusic](https://github.com/Fologne/FologneMusic/releases) e selecione **Draft a new release**.
 3. Use a tag `v2.0.0`, o título `FologneMusic 2.0.0` e a branch `master` com a documentação atualizada. Cole as [notas da versão](release-2.0.0.md).
-4. Anexe `FologneMusic-2.0.0.apk` em **Assets**. No computador onde o APK foi gerado, o arquivo está em `D:/FologneMusicBuild/apk/FologneMusic-2.0.0.apk`.
-5. Salve com **Save draft**. Publique após concluir a seção de licenças e disponibilizar as fontes correspondentes. [Instruções do GitHub](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository#creating-a-release)
+4. Anexe `FologneMusic-2.0.0.apk` e `FologneMusic-2.0.0-fontes-e-avisos.zip` em **Assets**. Os dois arquivos estão em `D:/FologneMusicBuild/release/v2.0.0/` no computador de compilação.
+5. Salve com **Save draft**. Publique após confirmar as fontes e os avisos pendentes. [Instruções do GitHub](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository#creating-a-release)
 
 ## Instalar e usar no celular
 
