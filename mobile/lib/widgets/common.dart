@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import '../library/media_library.dart';
 import 'playlist_actions.dart';
 
+import '../l10n/localization.dart';
+
 import 'package:flutter/material.dart';
 
 import '../core/theme.dart';
@@ -108,7 +110,7 @@ class _CoverArtState extends State<CoverArt> {
 
   @override
   Widget build(BuildContext context) => Semantics(
-    label: 'Capa de ${widget.track.title}',
+    label: context.l10n.coverArtFor(widget.track.title),
     image: true,
     child: ClipRRect(
       borderRadius: BorderRadius.circular(widget.size > 100 ? 24 : 12),
@@ -244,8 +246,6 @@ class Notice extends StatelessWidget {
   );
 }
 
-String musicCount(int count) => '$count ${count == 1 ? 'música' : 'músicas'}';
-
 String durationLabel(num seconds) =>
     '${seconds ~/ 60}:${(seconds.toInt() % 60).toString().padLeft(2, '0')}';
 
@@ -257,29 +257,32 @@ Future<void> _deleteTrack(
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
-      title: const Text('Apagar do celular?'),
-      content: Text('O arquivo “${track.title}” será apagado permanentemente.'),
+      title: Text(context.l10n.deleteFromThisDevice),
+      content: Text(context.l10n.deleteFileNotice(track.title)),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: const Text('Cancelar'),
+          child: Text(context.l10n.cancel),
         ),
         FilledButton(
           onPressed: () => Navigator.pop(context, true),
-          child: const Text('Apagar'),
+          child: Text(context.l10n.deleteFile),
         ),
       ],
     ),
   );
   if (confirmed != true || !context.mounted) return;
-  String message;
+  bool deleted;
   try {
     if (!await state.deleteFromDevice(track)) return;
-    message = 'Música apagada do celular.';
+    deleted = true;
   } catch (_) {
-    message = 'Não foi possível apagar o arquivo.';
+    deleted = false;
   }
   if (context.mounted) {
+    final message = deleted
+        ? context.l10n.trackDeletedFromThisDevice
+        : context.l10n.deleteFileFailed;
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
   }
@@ -314,7 +317,9 @@ class TrackTile extends StatelessWidget {
         ),
       ),
       subtitle: Text(
-        track.available ? track.artist : 'Arquivo indisponível',
+        track.available
+            ? context.localizedMessage(track.artist)
+            : context.l10n.fileUnavailable,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(color: AppColors.muted),
@@ -324,7 +329,7 @@ class TrackTile extends StatelessWidget {
       trailing:
           trailing ??
           PopupMenuButton<String>(
-            tooltip: 'Opções de ${track.title}',
+            tooltip: context.l10n.optionsFor(track.title),
             onSelected: (value) {
               if (value == 'favorite') state.toggleFavorite(track);
               if (value == 'playlist') addTracksToPlaylist(context, [track]);
@@ -335,12 +340,12 @@ class TrackTile extends StatelessWidget {
                   builder: (context) => AlertDialog(
                     title: Text(track.title),
                     content: Text(
-                      '${track.artist}\n${track.album}\n${durationLabel(track.seconds)}\n\n${track.folder}\n${track.available ? 'Arquivo local' : 'Arquivo indisponível'}',
+                      '${context.localizedMessage(track.artist)}\n${context.localizedMessage(track.album)}\n${durationLabel(track.seconds)}\n\n${track.folder}\n${track.available ? context.l10n.localFile : context.l10n.fileUnavailable}',
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: const Text('Fechar'),
+                        child: Text(context.l10n.close),
                       ),
                     ],
                   ),
@@ -352,19 +357,19 @@ class TrackTile extends StatelessWidget {
                 value: 'favorite',
                 child: Text(
                   state.favorites.contains(track.id)
-                      ? 'Remover dos favoritos'
-                      : 'Favoritar',
+                      ? context.l10n.removeFromFavorites
+                      : context.l10n.addToFavorites,
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'playlist',
-                child: Text('Adicionar à playlist'),
+                child: Text(context.l10n.addToPlaylist),
               ),
-              const PopupMenuItem(value: 'info', child: Text('Informações')),
+              PopupMenuItem(value: 'info', child: Text(context.l10n.details)),
               if (track.available)
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'delete',
-                  child: Text('Apagar do celular'),
+                  child: Text(context.l10n.deleteFromDevice),
                 ),
             ],
           ),

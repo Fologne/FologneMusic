@@ -1,7 +1,7 @@
 name: music_app
 description: Player Android com letras e significados offline.
 publish_to: none
-version: 2.0.0+16
+version: 2.1.0+20
 
 environment:
   sdk: ^3.13.7
@@ -26,6 +26,7 @@ dev_dependencies:
   flutter_lints: 6.0.0
 
 flutter:
+  generate: true
   uses-material-design: true
   assets:
     - assets/track_context.json

@@ -26,10 +26,13 @@
 !mobile/.gitignore
 !mobile/pubspec.yaml
 !mobile/pubspec.lock
+!mobile/l10n.yaml
 !mobile/analysis_options.yaml
 !mobile/lib/
 !mobile/lib/**/
 !mobile/lib/**/*.dart
+!mobile/lib/l10n/*.arb
+mobile/lib/l10n/generated/
 !mobile/assets/
 !mobile/assets/track_context.json
 !mobile/test/

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:music_app/l10n/localization.dart';
 import 'package:music_app/library/audio_download_queue.dart';
 import 'package:music_app/library/music_controller.dart';
 import 'package:music_app/main.dart';
@@ -32,6 +33,7 @@ void main() {
       media: FakeMedia(),
       store: MemoryStore(),
       handler: FakeHandler(),
+      language: AppLanguage.pt,
     );
     await state.initialize();
     final queue = AudioDownloadQueue(

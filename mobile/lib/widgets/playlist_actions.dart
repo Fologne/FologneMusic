@@ -1,3 +1,5 @@
+import '../l10n/localization.dart';
+
 import 'package:flutter/material.dart';
 
 import '../library/music_controller.dart';
@@ -12,12 +14,16 @@ Future<String?> playlistNameDialog(
     context: context,
     builder: (context) => StatefulBuilder(
       builder: (context, update) => AlertDialog(
-        title: Text(initial.isEmpty ? 'Nova playlist' : 'Renomear playlist'),
+        title: Text(
+          initial.isEmpty
+              ? context.l10n.newPlaylist
+              : context.l10n.renamePlaylist,
+        ),
         content: TextFormField(
           initialValue: initial,
           autofocus: true,
           maxLength: 80,
-          decoration: const InputDecoration(labelText: 'Nome'),
+          decoration: InputDecoration(labelText: context.l10n.name),
           onChanged: (text) => update(() => value = text),
           onFieldSubmitted: (_) {
             if (value.trim().isNotEmpty) Navigator.pop(context, value.trim());
@@ -26,13 +32,13 @@ Future<String?> playlistNameDialog(
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: value.trim().isEmpty
                 ? null
                 : () => Navigator.pop(context, value.trim()),
-            child: const Text('Salvar'),
+            child: Text(context.l10n.save),
           ),
         ],
       ),
@@ -51,13 +57,16 @@ Future<void> addTracksToPlaylist(
       child: ListView(
         shrinkWrap: true,
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(20),
-            child: Text('Adicionar à playlist', style: TextStyle(fontSize: 22)),
+            child: Text(
+              context.l10n.addToPlaylist,
+              style: TextStyle(fontSize: 22),
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.add),
-            title: const Text('Nova playlist'),
+            title: Text(context.l10n.newPlaylist),
             onTap: () => Navigator.pop(context, 'new'),
           ),
           for (final playlist in state.playlists)
@@ -81,9 +90,9 @@ Future<void> addTracksToPlaylist(
   if (playlist != null) {
     await state.addToPlaylist(playlist, tracks);
     if (context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Adicionado a ${playlist.name}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.addedTo(playlist.name))),
+      );
     }
   }
 }
@@ -110,18 +119,18 @@ Future<void> pickPlaylistTracks(
               height: MediaQuery.sizeOf(context).height * .7,
               child: Column(
                 children: [
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.all(16),
                     child: Text(
-                      'Adicionar músicas',
+                      context.l10n.addTracks,
                       style: TextStyle(fontSize: 22),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: TextField(
-                      decoration: const InputDecoration(
-                        hintText: 'Pesquisar músicas',
+                      decoration: InputDecoration(
+                        hintText: context.l10n.searchTracks,
                       ),
                       onChanged: (text) => update(() => query = text),
                     ),
@@ -141,7 +150,9 @@ Future<void> pickPlaylistTracks(
                             overflow: TextOverflow.ellipsis,
                           ),
                           subtitle: Text(
-                            exists ? 'Já adicionada' : track.artist,
+                            exists
+                                ? context.l10n.alreadyAdded
+                                : context.localizedMessage(track.artist),
                           ),
                           value: exists || selected.contains(track.id),
                           onChanged: exists
@@ -163,7 +174,7 @@ Future<void> pickPlaylistTracks(
                       onPressed: selected.isEmpty
                           ? null
                           : () => Navigator.pop(context, selected),
-                      child: Text('Adicionar (${selected.length})'),
+                      child: Text(context.l10n.add(selected.length)),
                     ),
                   ),
                 ],

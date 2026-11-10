@@ -8,9 +8,9 @@ Faixas podem ser pesquisadas por título, artista ou álbum e ordenadas por tít
 
 O menu de cada faixa permite favoritar, adicionar à playlist e consultar informações. Uma playlist permite adicionar/remover faixas, renomear, excluir, escolher a capa de uma de suas músicas e reordenar por arraste. A ordenação manual fica disponível sem busca ou ordenação temporária. Duplicatas não são inseridas. Excluir uma playlist não apaga músicas.
 
-O player oferece pausa, avanço, retrocesso, posição, aleatório, repetição e fila reordenável. O botão anterior volta ao início após três segundos; antes disso, vai à faixa anterior. Ao chegar ao fim sem repetição, a reprodução para. O controle Encerrar reprodução nas configurações libera o serviço de áudio.
+O player oferece pausa, avanço, retrocesso, posição, aleatório, repetição e fila reordenável. O botão **Anterior** vai para a faixa anterior no primeiro toque. Ao chegar ao fim sem repetição, a reprodução para. A fila abre com a faixa atual no topo e acompanha a troca de faixa. O controle **Encerrar reprodução** nas configurações libera o serviço de áudio.
 
-No player, **Temporizador** programa uma pausa entre 5 e 60 minutos. Em **Configurações**, é possível ajustar o tamanho dos textos, usar um tema mais escuro e alternar a capa no fundo do player e das playlists. Na ordem por título, bibliotecas com pelo menos 20 faixas mostram o índice lateral.
+No player, **Temporizador** programa uma pausa entre 5 e 60 minutos. Em **Configurações**, é possível ajustar o tamanho dos textos, usar um tema mais escuro, alternar a capa no fundo e mudar o idioma da interface. Na ordem por título, bibliotecas com pelo menos 20 faixas mostram o índice lateral.
 
 ## Letras e significados
 

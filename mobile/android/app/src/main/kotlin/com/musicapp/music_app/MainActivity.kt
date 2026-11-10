@@ -27,45 +27,32 @@ import java.util.concurrent.Executors
 
 class MainActivity : AudioServiceActivity() {
     private val worker = Executors.newFixedThreadPool(2)
-    private val pendingShares = ArrayDeque<String>()
-    private var shareChannel: MethodChannel? = null
     private var permissionResult: MethodChannel.Result? = null
     private var pendingDelete: Pair<Uri, MethodChannel.Result>? = null
     private val audioPermission: String
         get() = if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_AUDIO else Manifest.permission.READ_EXTERNAL_STORAGE
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val sharedIntent = intent
+        val openDownloads = intent.action == DownloadShare.openAction
         super.onCreate(savedInstanceState)
-        if (savedInstanceState == null) receiveShare(sharedIntent)
+        if (openDownloads && savedInstanceState == null) DownloadShare.openDownloads()
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        receiveShare(intent)
-    }
-
-    private fun receiveShare(intent: Intent) {
-        if (intent.action != Intent.ACTION_SEND || intent.type != "text/plain") return
-        val text = intent.getCharSequenceExtra(Intent.EXTRA_TEXT)
-            ?: intent.clipData?.getItemAt(0)?.text
-        if (pendingShares.size == 8) pendingShares.removeFirst()
-        pendingShares.addLast(text?.take(8192)?.toString().orEmpty())
-        shareChannel?.invokeMethod("shareAvailable", null)
+        if (intent.action == DownloadShare.openAction) DownloadShare.openDownloads()
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        registerAudioDownloads(applicationContext, flutterEngine.dartExecutor.binaryMessenger)
-        shareChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "musicapp/share").apply {
-            setMethodCallHandler { call, result ->
-                if (call.method == "takeSharedText") result.success(pendingShares.removeFirstOrNull())
-                else result.notImplemented()
-            }
-        }
+        DownloadShare.attach(applicationContext, flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "musicapp/media").setMethodCallHandler { call, result ->
             when (call.method) {
                 "hasPermission" -> result.success(checkSelfPermission(audioPermission) == PackageManager.PERMISSION_GRANTED)
+                "requestDownloadNotifications" -> {
+                    DownloadNotifications.request(this)
+                    result.success(null)
+                }
                 "requestPermission" -> {
                     if (checkSelfPermission(audioPermission) == PackageManager.PERMISSION_GRANTED) result.success(true)
                     else if (permissionResult != null) result.error("busy", "Uma solicitação já está aberta.", null)

@@ -1,3 +1,5 @@
+import '../l10n/localization.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -30,13 +32,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final url = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Endereço do servidor'),
+        title: Text(context.l10n.serverAddress),
         content: Form(
           key: form,
           child: TextFormField(
             initialValue: value,
             keyboardType: TextInputType.url,
-            decoration: const InputDecoration(labelText: 'URL da API'),
+            decoration: InputDecoration(labelText: context.l10n.apiUrl),
             onChanged: (text) => value = text.trim(),
             validator: (_) {
               final uri = Uri.tryParse(value);
@@ -47,7 +49,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   uri.userInfo.isNotEmpty ||
                   !(uri.scheme == 'https' ||
                       (!kReleaseMode && uri.scheme == 'http'))) {
-                return 'Informe uma URL válida ${kReleaseMode ? 'HTTPS' : 'HTTP ou HTTPS'}.';
+                return context.l10n.invalidApiUrl(
+                  kReleaseMode ? 'HTTPS' : 'HTTP ou HTTPS',
+                );
               }
               return null;
             },
@@ -56,13 +60,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
               if (form.currentState!.validate()) Navigator.pop(context, value);
             },
-            child: const Text('Salvar'),
+            child: Text(context.l10n.save),
           ),
         ],
       ),
@@ -77,35 +81,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final state = MusicScope.of(context);
     final api = widget.api ?? HealthApi(baseUrl: state.apiBaseUrl);
     return Scaffold(
-      appBar: AppBar(title: const Text('Configurações')),
+      appBar: AppBar(title: Text(context.l10n.settings)),
       body: AppBackground(
         child: ListView(
           padding: const EdgeInsets.all(24),
           children: [
-            const SectionTitle('Aparência'),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.language),
+              title: Text(context.l10n.appLanguage),
+              trailing: DropdownButton<AppLanguage>(
+                value: state.language,
+                items: [
+                  DropdownMenuItem(
+                    value: AppLanguage.system,
+                    child: Text(context.l10n.systemLanguage),
+                  ),
+                  const DropdownMenuItem(
+                    value: AppLanguage.pt,
+                    child: Text('Português'),
+                  ),
+                  const DropdownMenuItem(
+                    value: AppLanguage.en,
+                    child: Text('English'),
+                  ),
+                ],
+                onChanged: (value) {
+                  if (value != null) state.setLanguage(value);
+                },
+              ),
+            ),
+            SectionTitle(context.l10n.appearance),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               secondary: const Icon(
                 Icons.dark_mode_outlined,
                 color: AppColors.accent,
               ),
-              title: const Text('Tema mais escuro'),
+              title: Text(context.l10n.darkerTheme),
               subtitle: Text(
                 state.midnightTheme
-                    ? 'Preto com detalhes em azul'
-                    : 'Azul-marinho e preto',
+                    ? context.l10n.blackWithBlueAccents
+                    : context.l10n.navyBlueAndBlack,
               ),
               value: state.midnightTheme,
               onChanged: (value) => state.setAppearance(midnight: value),
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Capa no fundo'),
-              subtitle: const Text('Player e detalhes da playlist'),
+              title: Text(context.l10n.coverArtBackground),
+              subtitle: Text(context.l10n.playerAndPlaylistDetails),
               value: state.coverBackground,
               onChanged: (value) => state.setAppearance(showCover: value),
             ),
-            Text('Tamanho do texto · ${state.readingSize.round()}'),
+            Text(context.l10n.textSize(state.readingSize.round())),
             Slider(
               value: state.readingSize,
               min: 16,
@@ -113,7 +142,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               divisions: 6,
               label: '${state.readingSize.round()}',
               semanticFormatterCallback: (value) =>
-                  'Tamanho do texto ${value.round()}',
+                  context.l10n.textSizeAccessibility(value.round()),
               onChanged: (value) => state.setAppearance(fontSize: value),
             ),
             const Divider(),
@@ -121,8 +150,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.download_outlined),
-                title: const Text('Textos salvos'),
-                subtitle: const Text('Espaço usado e leitura offline'),
+                title: Text(context.l10n.savedTexts),
+                subtitle: Text(context.l10n.storageUsedAndOfflineReading),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => Navigator.push(
                   context,
@@ -131,9 +160,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
               ),
-            const SectionTitle('Biblioteca local'),
-            const Text(
-              'As músicas são lidas do celular. Playlists, favoritos, histórico, fila e textos baixados ficam salvos neste aparelho.',
+            SectionTitle(context.l10n.localLibrary),
+            Text(
+              context.l10n.localStorageNotice,
               style: TextStyle(color: AppColors.muted),
             ),
             const SizedBox(height: 16),
@@ -141,7 +170,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             TextButton.icon(
               onPressed: () => MusicScope.of(context).media.openSettings(),
               icon: const Icon(Icons.settings),
-              label: const Text('Permissões do aplicativo'),
+              label: Text(context.l10n.appPermissions),
             ),
             TextButton.icon(
               onPressed: () async {
@@ -149,18 +178,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 final confirm = await showDialog<bool>(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: const Text('Limpar histórico?'),
-                    content: const Text(
-                      'Favoritos e playlists serão mantidos.',
-                    ),
+                    title: Text(context.l10n.clearListeningHistory),
+                    content: Text(context.l10n.clearListeningHistoryNotice),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Cancelar'),
+                        child: Text(context.l10n.cancel),
                       ),
                       FilledButton(
                         onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Limpar'),
+                        child: Text(context.l10n.clear),
                       ),
                     ],
                   ),
@@ -168,22 +195,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 if (confirm == true) await state.clearHistory();
               },
               icon: const Icon(Icons.history),
-              label: const Text('Limpar histórico'),
+              label: Text(context.l10n.clearHistory),
             ),
             TextButton.icon(
               onPressed: () => MusicScope.of(context).handler.stop(),
               icon: const Icon(Icons.stop_circle_outlined),
-              label: const Text('Encerrar reprodução'),
+              label: Text(context.l10n.stopPlayback),
             ),
             const Divider(height: 40),
-            const SectionTitle('Busca de textos'),
+            SectionTitle(context.l10n.textSearch),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Usar servidor Django'),
+              title: Text(context.l10n.useDjangoServer),
               subtitle: Text(
                 state.useDjango
-                    ? 'Busca pela API configurada'
-                    : 'Busca direta pela internet do celular',
+                    ? context.l10n.djangoSearchDescription
+                    : context.l10n.directSearchDescription,
               ),
               value: state.useDjango,
               onChanged: status == ConnectionStatus.loading
@@ -210,19 +237,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ? null
                       : () => _editServer(state),
                   icon: const Icon(Icons.edit_outlined),
-                  label: const Text('Alterar endereço'),
+                  label: Text(context.l10n.changeAddress),
                 ),
               ),
               const SizedBox(height: 20),
               Semantics(
                 liveRegion: true,
                 child: Text(switch (status) {
-                  ConnectionStatus.idle => 'Conexão ainda não verificada',
-                  ConnectionStatus.loading => 'Verificando conexão…',
-                  ConnectionStatus.online => 'Servidor conectado',
+                  ConnectionStatus.idle => context.l10n.connectionUnchecked,
+                  ConnectionStatus.loading => context.l10n.checkingConnection,
+                  ConnectionStatus.online => context.l10n.serverConnected,
                   ConnectionStatus.offline =>
-                    'Servidor indisponível ou sem conexão',
-                  ConnectionStatus.error => 'Resposta inválida do servidor',
+                    context.l10n.serverUnavailableOrNoConnection,
+                  ConnectionStatus.error => context.l10n.invalidServerResponse,
                 }, key: const Key('connection-status')),
               ),
               const SizedBox(height: 16),
@@ -237,7 +264,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.sync),
-                label: const Text('Verificar conexão'),
+                label: Text(context.l10n.checkConnection),
               ),
             ],
           ],
@@ -262,16 +289,16 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Remover textos salvos?'),
+        title: Text(context.l10n.removeSavedTexts),
         content: Text(entry.title),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Remover'),
+            child: Text(context.l10n.remove),
           ),
         ],
       ),
@@ -283,7 +310,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Não foi possível remover os textos.')),
+          SnackBar(content: Text(context.l10n.savedTextRemoveFailed)),
         );
       }
     }
@@ -297,15 +324,13 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Textos salvos')),
+    appBar: AppBar(title: Text(context.l10n.savedTexts)),
     body: AppBackground(
       child: FutureBuilder<List<SavedTrackTexts>>(
         future: entries,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return const Center(
-              child: Text('Não foi possível ler o armazenamento.'),
-            );
+            return Center(child: Text(context.l10n.storageReadFailed));
           }
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -315,24 +340,27 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           return ListView(
             padding: const EdgeInsets.all(24),
             children: [
-              SectionTitle('${_size(used)} de ${_size(widget.store.maxBytes)}'),
-              if (items.isEmpty)
-                const Text(
-                  'Nenhum texto salvo. Use Salvar offline no player quando a fonte permitir.',
+              SectionTitle(
+                context.l10n.storageUsage(
+                  _size(used),
+                  _size(widget.store.maxBytes),
                 ),
+              ),
+              if (items.isEmpty) Text(context.l10n.emptySavedTextsHint),
               for (final item in items)
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text(item.title),
                   subtitle: Text(
                     [
-                      if (item.artist.isNotEmpty) item.artist,
-                      ...item.kinds.map((kind) => kind.label),
+                      if (item.artist.isNotEmpty)
+                        context.localizedMessage(item.artist),
+                      ...item.kinds.map(context.textKindLabel),
                       _size(item.bytes),
                     ].join(' · '),
                   ),
                   trailing: IconButton(
-                    tooltip: 'Remover textos de ${item.title}',
+                    tooltip: context.l10n.removeTextsFor(item.title),
                     onPressed: () => _remove(item),
                     icon: const Icon(Icons.delete_outline),
                   ),

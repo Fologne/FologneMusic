@@ -1,0 +1,16 @@
+<resources>
+    <string name="preparing_download">Preparando download…</string>
+    <string name="view_download">Ver download</string>
+    <string name="download_started">O download começou.</string>
+    <string name="download_queued">O download foi adicionado à fila.</string>
+    <string name="download_duplicate">Este link já está na fila ou no histórico.</string>
+    <string name="share_invalid">Compartilhe o link de um vídeo do YouTube.</string>
+    <string name="share_unavailable">O download de áudio não está disponível nesta versão.</string>
+    <string name="share_failed">Não foi possível adicionar o download.</string>
+    <string name="downloads_in_progress">Downloads em andamento</string>
+    <string name="downloading_audio">Baixando áudio</string>
+    <string name="preparing_mp3">Preparando o MP3 no FologneMusic.</string>
+    <string name="completed_downloads">Downloads concluídos</string>
+    <string name="download_completed">Download concluído</string>
+    <string name="music_playback">Reprodução de música</string>
+</resources>

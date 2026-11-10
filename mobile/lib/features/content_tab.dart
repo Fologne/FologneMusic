@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../content/content_api.dart';
 import '../core/theme.dart';
 import '../library/media_library.dart';
+import '../l10n/localization.dart';
 import '../library/music_controller.dart';
 import '../widgets/common.dart';
 
@@ -194,13 +195,13 @@ class _ContentTabState extends State<ContentTab>
         result == online &&
         result != offline &&
         (result?.offlineAllowed ?? false);
-    final title = widget.kind.label;
+    final title = context.textKindLabel(widget.kind);
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
       children: [
         Text(widget.track.title, style: Theme.of(context).textTheme.titleLarge),
         Text(
-          widget.track.artist,
+          context.localizedMessage(widget.track.artist),
           style: const TextStyle(color: AppColors.muted),
         ),
         const SizedBox(height: 16),
@@ -211,35 +212,44 @@ class _ContentTabState extends State<ContentTab>
             FilledButton.tonalIcon(
               onPressed: loading ? null : _lookup,
               icon: Icon(result == null ? Icons.search : Icons.refresh),
-              label: Text(result == null ? 'Buscar $title' : 'Atualizar busca'),
+              label: Text(
+                result == null
+                    ? context.l10n.searchFor(title)
+                    : context.l10n.refreshSearch,
+              ),
             ),
             OutlinedButton.icon(
               onPressed: loading ? null : _editSearch,
               icon: const Icon(Icons.edit_outlined),
-              label: const Text('Corrigir busca'),
+              label: Text(context.l10n.editSearch),
             ),
           ],
         ),
         if (loading)
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 16),
-            child: LinearProgressIndicator(semanticsLabel: 'Aguarde'),
+            child: LinearProgressIndicator(
+              semanticsLabel: context.l10n.pleaseWait,
+            ),
           ),
         if (offline != null)
-          const ListTile(
+          ListTile(
             contentPadding: EdgeInsets.zero,
             leading: Icon(Icons.offline_pin_outlined),
-            title: Text('Disponível offline'),
+            title: Text(context.l10n.availableOffline),
           ),
         if (message != null)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Semantics(liveRegion: true, child: Text(message!)),
+            child: Semantics(
+              liveRegion: true,
+              child: Text(context.localizedMessage(message!)),
+            ),
           ),
         if (candidates.isNotEmpty) ...[
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 16),
-            child: Text('Escolha a gravação'),
+            child: Text(context.l10n.chooseARecording),
           ),
           for (final candidate in candidates)
             ListTile(
@@ -260,20 +270,18 @@ class _ContentTabState extends State<ContentTab>
         if (result == null && message == null && !loading && candidates.isEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 20),
-            child: Text('Busque $title na internet usando os dados da faixa.'),
+            child: Text(context.l10n.searchTextHint(title)),
           ),
         if (result != null) ...[
           const SizedBox(height: 16),
           if (result.kind == 'artist_commentary')
-            const Text('Comentário do artista resumido'),
+            Text(context.l10n.artistCommentary),
           if (result.kind == 'encyclopedic_context')
-            const Text('Contexto enciclopédico disponível na fonte.'),
+            Text(context.l10n.encyclopedicContext),
           if (result.kind == 'editorial_context')
-            const Text('Interpretação da faixa'),
+            Text(context.l10n.editorialContext),
           if (timingDiffers && widget.kind == TextKind.lyrics)
-            const Text(
-              'Esta gravação tem outra duração. A letra é exibida sem sincronização.',
-            ),
+            Text(context.l10n.lyricsTimingDiffers),
           if (currentLine != null && currentLine.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
@@ -295,27 +303,31 @@ class _ContentTabState extends State<ContentTab>
             )
           else if (result.status != 'link_only')
             Text(switch (result.status) {
-              'instrumental' =>
-                'A fonte identifica esta faixa como instrumental.',
-              'language_unavailable' =>
-                'A fonte não oferece contexto neste idioma.',
-              'not_resolved' => 'Escolha a gravação para consultar a letra.',
-              _ => '$title não encontrado para esta faixa.',
+              'instrumental' => context.l10n.instrumentalTrack,
+              'language_unavailable' => context.l10n.sourceLanguageUnavailable,
+              'not_resolved' => context.l10n.chooseRecordingForLyrics,
+              _ =>
+                widget.kind == TextKind.lyrics
+                    ? context.l10n.lyricsNotFoundForTrack
+                    : context.l10n.meaningNotFound,
             }),
           if (offline != null && online != null && online!.status != 'found')
-            const Text(
-              'A atualização não trouxe outro texto. A cópia salva foi mantida.',
-            ),
+            Text(context.l10n.offlineCopyKept),
           if (result.sourceName case final String source)
             Padding(
               padding: const EdgeInsets.only(top: 16),
               child: Text(
                 [
-                  'Fonte: $source',
+                  context.l10n.source(source),
                   if (result.sourceTitle case final String title) title,
-                  'Idioma: ${result.language ?? 'original (não informado pela fonte)'}',
+                  context.l10n.language(
+                    result.language ?? context.l10n.originalLanguage,
+                  ),
                   if (result.fetchedAt case final DateTime date)
-                    'Consulta: ${MaterialLocalizations.of(context).formatCompactDate(date.toLocal())}',
+                    context.l10n.lookedUpOn(
+                      MaterialLocalizations.of(context)
+                          .formatCompactDate(date.toLocal()),
+                    ),
                 ].join(' · '),
                 style: const TextStyle(color: AppColors.muted),
               ),
@@ -326,7 +338,7 @@ class _ContentTabState extends State<ContentTab>
               child: TextButton.icon(
                 onPressed: () => _openSource(url),
                 icon: const Icon(Icons.open_in_new),
-                label: const Text('Abrir fonte'),
+                label: Text(context.l10n.openSource),
               ),
             ),
           if (canDownload)
@@ -337,15 +349,13 @@ class _ContentTabState extends State<ContentTab>
                 icon: const Icon(Icons.download_outlined),
                 label: Text(
                   offline == null
-                      ? 'Salvar offline'
-                      : 'Atualizar cópia offline',
+                      ? context.l10n.saveOffline
+                      : context.l10n.updateOfflineCopy,
                 ),
               ),
             )
           else if (result.status == 'found' && !result.offlineAllowed)
-            const Text(
-              'Esta fonte oferece leitura online. A cópia offline não está disponível.',
-            ),
+            Text(context.l10n.onlineReadingOnly),
         ],
       ],
     );
@@ -377,7 +387,7 @@ class _SearchDialogState extends State<_SearchDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Corrigir busca'),
+    title: Text(context.l10n.editSearch),
     scrollable: true,
     content: Form(
       key: form,
@@ -385,22 +395,22 @@ class _SearchDialogState extends State<_SearchDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           for (final (field, controller, required) in [
-            ('Título', title, true),
-            ('Artista', artist, true),
-            ('Álbum', album, false),
+            (context.l10n.title, title, true),
+            (context.l10n.artist, artist, true),
+            (context.l10n.album, album, false),
           ])
             TextFormField(
               controller: controller,
               maxLength: 240,
               decoration: InputDecoration(labelText: field, counterText: ''),
               validator: (value) => required && (value?.trim().isEmpty ?? true)
-                  ? 'Preencha este campo'
+                  ? context.l10n.enterAValue
                   : null,
             ),
           if (widget.search.durationMs != null)
             CheckboxListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Considerar a duração'),
+              title: Text(context.l10n.useTrackDuration),
               value: useDuration,
               onChanged: (value) => setState(() => useDuration = value == true),
             ),
@@ -410,7 +420,7 @@ class _SearchDialogState extends State<_SearchDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
+        child: Text(context.l10n.cancel),
       ),
       FilledButton(
         onPressed: () {
@@ -425,7 +435,7 @@ class _SearchDialogState extends State<_SearchDialog> {
             ),
           );
         },
-        child: const Text('Buscar'),
+        child: Text(context.l10n.search),
       ),
     ],
   );

@@ -1,3 +1,5 @@
+import '../l10n/localization.dart';
+
 import 'package:flutter/material.dart';
 
 import '../core/app_info.dart';
@@ -11,8 +13,9 @@ import 'player_screen.dart';
 import 'settings_screen.dart';
 
 class LibraryScreen extends StatefulWidget {
-  const LibraryScreen({super.key, this.audioQueue});
+  const LibraryScreen({super.key, this.audioQueue, this.openDownloads = false});
   final AudioDownloadQueue? audioQueue;
+  final bool openDownloads;
   @override
   State<LibraryScreen> createState() => _LibraryScreenState();
 }
@@ -58,7 +61,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       child: Icon(icon, color: AppColors.accent),
     ),
     title: Text(title, maxLines: 2, overflow: TextOverflow.ellipsis),
-    subtitle: Text(musicCount(count)),
+    subtitle: Text(context.l10n.trackCount(count)),
     trailing: const Icon(Icons.chevron_right),
     onTap: () => openCollection(title, kind, value),
   );
@@ -69,7 +72,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
     EdgeInsetsGeometry? padding,
   }) => RefreshIndicator(
     onRefresh: state.refresh,
-    semanticsLabel: 'Atualizar biblioteca',
+    semanticsLabel: context.l10n.refreshLibrary,
     child: ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: padding,
@@ -95,7 +98,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       children: [
         RefreshIndicator(
           onRefresh: state.refresh,
-          semanticsLabel: 'Atualizar biblioteca',
+          semanticsLabel: context.l10n.refreshLibrary,
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             key: const PageStorageKey('track-list'),
@@ -106,23 +109,23 @@ class _LibraryScreenState extends State<LibraryScreen> {
                   children: [
                     SectionTitle(
                       selected.isEmpty
-                          ? musicCount(filtered.length)
-                          : '${selected.length} selecionadas',
+                          ? context.l10n.trackCount(filtered.length)
+                          : context.l10n.selectedTracks(selected.length),
                       trailing: selected.isEmpty
                           ? PopupMenuButton<TrackSort>(
-                              tooltip: 'Ordenar músicas',
+                              tooltip: context.l10n.sortTracks,
                               icon: const Icon(Icons.sort),
                               onSelected: state.setSort,
                               itemBuilder: (_) => [
                                 for (final value in TrackSort.values)
                                   PopupMenuItem(
                                     value: value,
-                                    child: Text(sortLabel(value)),
+                                    child: Text(sortLabel(context, value)),
                                   ),
                               ],
                             )
                           : IconButton(
-                              tooltip: 'Limpar seleção',
+                              tooltip: context.l10n.clearSelection,
                               onPressed: () => setState(selected.clear),
                               icon: const Icon(Icons.close),
                             ),
@@ -142,7 +145,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                           if (mounted) setState(selected.clear);
                         },
                         icon: const Icon(Icons.playlist_add),
-                        label: const Text('Adicionar à playlist'),
+                        label: Text(context.l10n.addToPlaylist),
                       ),
                     if (filtered.isEmpty)
                       Notice(
@@ -150,11 +153,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
                             ? Icons.music_note_outlined
                             : Icons.search_off,
                         title: query.isEmpty
-                            ? 'Nenhuma música no aparelho'
-                            : 'Nenhuma música encontrada',
+                            ? context.l10n.noMusicOnThisDevice
+                            : context.l10n.noTracksFound,
                         message: query.isEmpty
-                            ? 'Copie arquivos de áudio para o celular e toque em atualizar.'
-                            : 'Tente outro título, artista ou álbum.',
+                            ? context.l10n.emptyLibraryHint
+                            : context.l10n.emptySearchHint,
                       ),
                   ],
                 ),
@@ -248,8 +251,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         child: Text(
                           letter,
                           semanticsLabel: letter == '*'
-                              ? 'Ir para outros caracteres'
-                              : 'Ir para $letter',
+                              ? context.l10n.jumpToOtherCharacters
+                              : context.l10n.jumpTo(letter),
                         ),
                       ),
                   ],
@@ -268,7 +271,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
     final tracks = state.tracks;
     return DefaultTabController(
       length: widget.audioQueue == null ? 5 : 6,
-      initialIndex: 1,
+      initialIndex: widget.openDownloads && widget.audioQueue != null ? 5 : 1,
       child: Scaffold(
         body: AppBackground(
           child: SafeArea(
@@ -301,7 +304,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         ),
                       ),
                       IconButton(
-                        tooltip: 'Pesquisar músicas',
+                        tooltip: context.l10n.searchTracks,
                         onPressed: () => setState(() {
                           searching = !searching;
                           if (!searching) query = '';
@@ -309,12 +312,12 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         icon: Icon(searching ? Icons.close : Icons.search),
                       ),
                       IconButton(
-                        tooltip: 'Atualizar biblioteca',
+                        tooltip: context.l10n.refreshLibrary,
                         onPressed: state.loading ? null : () => state.refresh(),
                         icon: const Icon(Icons.refresh),
                       ),
                       PopupMenuButton<String>(
-                        tooltip: 'Menu',
+                        tooltip: context.l10n.menu,
                         onSelected: (value) {
                           final store = state.downloads;
                           Navigator.push(
@@ -329,14 +332,14 @@ class _LibraryScreenState extends State<LibraryScreen> {
                         },
                         icon: const Icon(Icons.more_vert),
                         itemBuilder: (_) => [
-                          const PopupMenuItem(
+                          PopupMenuItem(
                             value: 'settings',
-                            child: Text('Configurações'),
+                            child: Text(context.l10n.settings),
                           ),
                           if (state.downloads != null)
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'downloads',
-                              child: Text('Textos salvos'),
+                              child: Text(context.l10n.savedTexts),
                             ),
                         ],
                       ),
@@ -351,8 +354,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
                     ),
                     child: TextField(
                       autofocus: true,
-                      decoration: const InputDecoration(
-                        hintText: 'Título, artista ou álbum',
+                      decoration: InputDecoration(
+                        hintText: context.l10n.titleArtistOrAlbum,
                       ),
                       onChanged: (value) => setState(() => query = value),
                     ),
@@ -361,11 +364,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
                   isScrollable: true,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   tabs: [
-                    const Tab(text: 'Para você'),
-                    const Tab(text: 'Faixas'),
+                    Tab(text: context.l10n.forYou),
+                    Tab(text: context.l10n.tracks),
                     const Tab(text: 'Playlists'),
-                    const Tab(text: 'Pastas'),
-                    const Tab(text: 'Álbuns'),
+                    Tab(text: context.l10n.folders),
+                    Tab(text: context.l10n.albums),
                     if (widget.audioQueue != null) const Tab(text: 'Downloads'),
                   ],
                 ),
@@ -377,12 +380,12 @@ class _LibraryScreenState extends State<LibraryScreen> {
                       children: [
                         Expanded(
                           child: Text(
-                            state.error!,
+                            context.localizedMessage(state.error!),
                             style: const TextStyle(color: AppColors.accent),
                           ),
                         ),
                         IconButton(
-                          tooltip: 'Fechar aviso',
+                          tooltip: context.l10n.dismissNotice,
                           onPressed: state.clearError,
                           icon: const Icon(Icons.close),
                         ),
@@ -397,21 +400,19 @@ class _LibraryScreenState extends State<LibraryScreen> {
                           _refreshList(state, [
                             Notice(
                               icon: Icons.library_music_outlined,
-                              title: 'Sua música começa aqui',
-                              message: 'Permita o acesso aos arquivos de áudio para encontrar as músicas do celular. Seus arquivos não serão enviados ao servidor.',
+                              title: context.l10n.audioPermissionTitle,
+                              message: context.l10n.audioPermissionNotice,
                               action: Column(
                                 children: [
                                   FilledButton(
                                     onPressed: () =>
                                         state.refresh(request: true),
-                                    child: const Text(
-                                      'Permitir acesso ao áudio',
-                                    ),
+                                    child: Text(context.l10n.allowAudioAccess),
                                   ),
                                   TextButton(
                                     onPressed: state.media.openSettings,
-                                    child: const Text(
-                                      'Abrir permissões do aplicativo',
+                                    child: Text(
+                                      context.l10n.openAppPermissions,
                                     ),
                                   ),
                                 ],
@@ -420,8 +421,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
                           ])
                       else ...[
                         _refreshList(state, [
-                          const Text(
-                            'NO SEU RITMO',
+                          Text(
+                            context.l10n.atYourOwnPace,
                             style: TextStyle(
                               letterSpacing: 2,
                               fontSize: 11,
@@ -430,17 +431,17 @@ class _LibraryScreenState extends State<LibraryScreen> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Sua música.\nSempre por perto.',
+                            context.l10n.libraryHeadline,
                             style: Theme.of(context).textTheme.headlineLarge,
                           ),
                           const SizedBox(height: 12),
-                          const Text(
-                            'Ouça seus arquivos, mesmo sem internet.',
+                          Text(
+                            context.l10n.librarySubtitle,
                             style: TextStyle(color: AppColors.muted),
                           ),
-                          const SectionTitle('Sua atividade'),
+                          SectionTitle(context.l10n.yourActivity),
                           collection(
-                            'Meus favoritos',
+                            context.l10n.myFavorites,
                             'favorites',
                             tracks
                                 .where((t) => state.favorites.contains(t.id))
@@ -448,28 +449,28 @@ class _LibraryScreenState extends State<LibraryScreen> {
                             Icons.favorite_border,
                           ),
                           collection(
-                            'Reproduzidas recentemente',
+                            context.l10n.recentlyPlayed,
                             'recent',
                             state.recent.length,
                             Icons.history,
                           ),
                           collection(
-                            'Mais ouvidas',
+                            context.l10n.mostPlayed,
                             'most',
                             state.mostPlayed.length,
                             Icons.equalizer,
                           ),
                           if (state.history.isEmpty)
-                            const Text(
-                              'Seu histórico aparece após ouvir 30 segundos ou metade de uma música curta.',
+                            Text(
+                              context.l10n.emptyHistoryHint,
                               style: TextStyle(color: AppColors.muted),
                             ),
                         ], padding: const EdgeInsets.all(24)),
                         _trackPage(state, filtered),
                         _refreshList(state, [
-                          const SectionTitle('Sua coleção'),
+                          SectionTitle(context.l10n.yourCollection),
                           collection(
-                            'Meus favoritos',
+                            context.l10n.myFavorites,
                             'favorites',
                             tracks
                                 .where((t) => state.favorites.contains(t.id))
@@ -477,27 +478,27 @@ class _LibraryScreenState extends State<LibraryScreen> {
                             Icons.favorite_border,
                           ),
                           collection(
-                            'Adicionadas recentemente',
+                            context.l10n.recentlyAdded,
                             'added',
                             state.recentlyAdded.length,
                             Icons.library_add_outlined,
                           ),
                           collection(
-                            'Reproduzidas recentemente',
+                            context.l10n.recentlyPlayed,
                             'recent',
                             state.recent.length,
                             Icons.history,
                           ),
                           collection(
-                            'Mais ouvidas',
+                            context.l10n.mostPlayed,
                             'most',
                             state.mostPlayed.length,
                             Icons.equalizer,
                           ),
                           SectionTitle(
-                            'Minhas playlists',
+                            context.l10n.myPlaylists,
                             trailing: IconButton(
-                              tooltip: 'Criar playlist',
+                              tooltip: context.l10n.createPlaylist,
                               onPressed: () async {
                                 final name = await playlistNameDialog(context);
                                 if (name != null) {
@@ -508,8 +509,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
                             ),
                           ),
                           if (state.playlists.isEmpty)
-                            const Text(
-                              'Crie uma playlist para organizar suas músicas.',
+                            Text(
+                              context.l10n.emptyPlaylistsHint,
                               style: TextStyle(color: AppColors.muted),
                             ),
                           for (final playlist in state.playlists)
@@ -522,7 +523,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                             ),
                         ], padding: const EdgeInsets.all(24)),
                         _refreshList(state, [
-                          const SectionTitle('Suas pastas'),
+                          SectionTitle(context.l10n.yourFolders),
                           for (final folder
                               in tracks.map((t) => t.folder).toSet().toList()
                                 ..sort())
@@ -535,7 +536,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                             ),
                         ], padding: const EdgeInsets.all(24)),
                         _refreshList(state, [
-                          const SectionTitle('Seus álbuns'),
+                          SectionTitle(context.l10n.yourAlbums),
                           for (final album
                               in tracks
                                   .map((t) => '${t.album}\u0000${t.artist}')
@@ -543,7 +544,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
                                   .toList()
                                 ..sort())
                             collection(
-                              album.split('\u0000').first,
+                              context.localizedMessage(
+                                album.split('\u0000').first,
+                              ),
                               'album',
                               tracks
                                   .where(
@@ -571,11 +574,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
   }
 }
 
-String sortLabel(TrackSort value) => switch (value) {
-  TrackSort.title => 'Título',
-  TrackSort.artist => 'Artista',
-  TrackSort.album => 'Álbum',
-  TrackSort.newest => 'Adição mais recente',
+String sortLabel(BuildContext context, TrackSort value) => switch (value) {
+  TrackSort.title => context.l10n.title,
+  TrackSort.artist => context.l10n.artist,
+  TrackSort.album => context.l10n.album,
+  TrackSort.newest => context.l10n.recentlyAddedFirst,
 };
 
 class PlaybackButtons extends StatelessWidget {
@@ -599,12 +602,12 @@ class PlaybackButtons extends StatelessWidget {
         FilledButton.icon(
           onPressed: available.isEmpty ? null : () => start(false),
           icon: const Icon(Icons.play_arrow),
-          label: const Text('Reproduzir'),
+          label: Text(context.l10n.play),
         ),
         OutlinedButton.icon(
           onPressed: available.isEmpty ? null : () => start(true),
           icon: const Icon(Icons.shuffle),
-          label: const Text('Aleatório'),
+          label: Text(context.l10n.shuffle),
         ),
       ],
     );
@@ -675,7 +678,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                 actions: [
                   if (playlist != null)
                     PopupMenuButton<String>(
-                      tooltip: 'Editar playlist',
+                      tooltip: context.l10n.editPlaylist,
                       onSelected: (action) async {
                         if (action == 'rename') {
                           final name = await playlistNameDialog(
@@ -689,11 +692,11 @@ class _CollectionScreenState extends State<CollectionScreen> {
                           final trackId = await showDialog<String>(
                             context: context,
                             builder: (context) => SimpleDialog(
-                              title: const Text('Capa da playlist'),
+                              title: Text(context.l10n.playlistCover),
                               children: [
                                 SimpleDialogOption(
                                   onPressed: () => Navigator.pop(context, ''),
-                                  child: const Text('Usar primeira música'),
+                                  child: Text(context.l10n.useFirstTrack),
                                 ),
                                 for (final track in all)
                                   SimpleDialogOption(
@@ -711,19 +714,17 @@ class _CollectionScreenState extends State<CollectionScreen> {
                           final confirmed = await showDialog<bool>(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: const Text('Excluir playlist?'),
-                              content: const Text(
-                                'Os arquivos de música serão mantidos no celular.',
-                              ),
+                              title: Text(context.l10n.deletePlaylist),
+                              content: Text(context.l10n.deletePlaylistNotice),
                               actions: [
                                 TextButton(
                                   onPressed: () =>
                                       Navigator.pop(context, false),
-                                  child: const Text('Cancelar'),
+                                  child: Text(context.l10n.cancel),
                                 ),
                                 FilledButton(
                                   onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('Excluir'),
+                                  child: Text(context.l10n.delete),
                                 ),
                               ],
                             ),
@@ -734,15 +735,18 @@ class _CollectionScreenState extends State<CollectionScreen> {
                           }
                         }
                       },
-                      itemBuilder: (_) => const [
-                        PopupMenuItem(value: 'rename', child: Text('Renomear')),
+                      itemBuilder: (_) => [
+                        PopupMenuItem(
+                          value: 'rename',
+                          child: Text(context.l10n.rename),
+                        ),
                         PopupMenuItem(
                           value: 'cover',
-                          child: Text('Alterar capa'),
+                          child: Text(context.l10n.changeCover),
                         ),
                         PopupMenuItem(
                           value: 'delete',
-                          child: Text('Excluir playlist'),
+                          child: Text(context.l10n.deletePlaylistAction),
                         ),
                       ],
                     ),
@@ -764,7 +768,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            musicCount(all.length),
+                            context.l10n.trackCount(all.length),
                             style: const TextStyle(color: AppColors.muted),
                           ),
                           const SizedBox(height: 20),
@@ -775,15 +779,15 @@ class _CollectionScreenState extends State<CollectionScreen> {
                               onPressed: () =>
                                   pickPlaylistTracks(context, playlist),
                               icon: const Icon(Icons.playlist_add),
-                              label: const Text('Adicionar músicas'),
+                              label: Text(context.l10n.addTracks),
                             ),
                           const SizedBox(height: 12),
                           Row(
                             children: [
                               Expanded(
                                 child: TextField(
-                                  decoration: const InputDecoration(
-                                    hintText: 'Pesquisar nesta lista',
+                                  decoration: InputDecoration(
+                                    hintText: context.l10n.searchThisList,
                                   ),
                                   onChanged: (text) =>
                                       setState(() => query = text),
@@ -791,8 +795,8 @@ class _CollectionScreenState extends State<CollectionScreen> {
                               ),
                               IconButton(
                                 tooltip: sorted
-                                    ? 'Ordem original'
-                                    : 'Ordenar por título',
+                                    ? context.l10n.originalOrder
+                                    : context.l10n.sortByTitle,
                                 onPressed: () =>
                                     setState(() => sorted = !sorted),
                                 icon: const Icon(Icons.sort_by_alpha),
@@ -802,10 +806,10 @@ class _CollectionScreenState extends State<CollectionScreen> {
                           if (all.isEmpty)
                             Notice(
                               icon: Icons.queue_music,
-                              title: 'Ainda sem músicas',
+                              title: context.l10n.noTracksYet,
                               message: widget.kind == 'added'
-                                  ? 'Nenhum arquivo de áudio dos últimos 90 dias.'
-                                  : 'Adicione músicas ou ouça sua biblioteca para preencher esta lista.',
+                                  ? context.l10n.emptyRecentlyAddedHint
+                                  : context.l10n.emptyCollectionHint,
                             ),
                         ],
                       ),
@@ -845,7 +849,8 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       IconButton(
-                                        tooltip: 'Remover da playlist',
+                                        tooltip:
+                                            context.l10n.removeFromPlaylist,
                                         onPressed: () =>
                                             state.removeFromPlaylist(
                                               playlist,
@@ -858,13 +863,13 @@ class _CollectionScreenState extends State<CollectionScreen> {
                                       if (canReorder)
                                         ReorderableDragStartListener(
                                           index: index,
-                                          child: const SizedBox(
+                                          child: SizedBox(
                                             width: 48,
                                             height: 48,
                                             child: Icon(
                                               Icons.drag_handle,
                                               semanticLabel:
-                                                  'Arraste para reordenar',
+                                                  context.l10n.dragToReorder,
                                             ),
                                           ),
                                         ),

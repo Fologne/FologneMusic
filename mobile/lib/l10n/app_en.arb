@@ -1,0 +1,420 @@
+{
+  "@@locale": "en",
+  "youtubeLink": "YouTube link",
+  "downloadPermissionNotice": "Only download videos you are authorized to download and convert.",
+  "cancel": "Cancel",
+  "downloadMp3": "Download MP3",
+  "confirm": "Confirm",
+  "invalidYoutubeLink": "Paste a YouTube video link.",
+  "duplicateDownloadLink": "This link is already in the queue or history.",
+  "downloadFileUnavailable": "File unavailable in the library.",
+  "clearDownloadHistory": "Clear download history?",
+  "clearDownloadHistoryNotice": "Saved MP3 files will remain in the library.",
+  "clear": "Clear",
+  "downloadsUnavailable": "Audio downloads are available in the experimental APK on compatible devices.",
+  "pasteLink": "Paste link",
+  "addToQueue": "Add to queue",
+  "downloadHistoryUnavailable": "Couldn't access download history.",
+  "queueAndHistory": "Queue and history",
+  "clearHistory": "Clear history",
+  "noDownloadsYet": "No downloads yet.",
+  "queued": "Queued",
+  "convertingAndSavingMp3": "Converting and saving MP3…",
+  "downloadingAudio": "Downloading audio · {progress}%",
+  "@downloadingAudio": {
+    "placeholders": {
+      "progress": {
+        "type": "int"
+      }
+    }
+  },
+  "preparingDownload": "Preparing download…",
+  "canceling": "Canceling…",
+  "completed": "Completed",
+  "downloadFailed": "Download failed.",
+  "canceled": "Canceled",
+  "cancelDownload": "Cancel download",
+  "tryAgain": "Try again",
+  "playMp3": "Play MP3",
+  "savedTextOpenFailed": "Couldn't open the saved text.",
+  "sourceRateLimited": "The source reached its request limit. Try again shortly.",
+  "sourceUnavailable": "The source is currently unavailable.",
+  "lyricsSearchFailed": "Lyrics not found. Check the title and artist.",
+  "serverResponseReadFailed": "Couldn't read the server response.",
+  "textSaveFailed": "Couldn't save the text on this device.",
+  "linkOpenFailed": "Couldn't open the link.",
+  "searchFor": "Search for {title}",
+  "@searchFor": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "refreshSearch": "Refresh search",
+  "editSearch": "Edit search",
+  "pleaseWait": "Please wait",
+  "availableOffline": "Available offline",
+  "chooseARecording": "Choose a recording",
+  "searchTextHint": "Search online for {title} using the track details.",
+  "@searchTextHint": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "artistCommentary": "Summary of the artist's commentary",
+  "encyclopedicContext": "Background information from the source.",
+  "editorialContext": "Interpretation of the track",
+  "lyricsTimingDiffers": "This recording has a different duration. Lyrics are displayed without synchronization.",
+  "instrumentalTrack": "The source identifies this track as instrumental.",
+  "sourceLanguageUnavailable": "The source has no background information in this language.",
+  "chooseRecordingForLyrics": "Choose a recording to look up the lyrics.",
+  "offlineCopyKept": "The search found no new text. The saved copy was kept.",
+  "source": "Source: {source}",
+  "@source": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "language": "Language: {language}",
+  "@language": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "lookedUpOn": "Looked up on: {date}",
+  "@lookedUpOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "openSource": "Open source",
+  "saveOffline": "Save offline",
+  "updateOfflineCopy": "Update offline copy",
+  "onlineReadingOnly": "This source can be read online. Offline saving is unavailable.",
+  "title": "Title",
+  "artist": "Artist",
+  "album": "Album",
+  "enterAValue": "Enter a value",
+  "useTrackDuration": "Use track duration",
+  "search": "Search",
+  "refreshLibrary": "Refresh library",
+  "sortTracks": "Sort tracks",
+  "clearSelection": "Clear selection",
+  "addToPlaylist": "Add to playlist",
+  "noMusicOnThisDevice": "No music on this device",
+  "noTracksFound": "No tracks found",
+  "emptyLibraryHint": "Copy audio files to your device and tap refresh.",
+  "emptySearchHint": "Try another title, artist, or album.",
+  "jumpToOtherCharacters": "Jump to other characters",
+  "jumpTo": "Jump to {letter}",
+  "@jumpTo": {
+    "placeholders": {
+      "letter": {
+        "type": "String"
+      }
+    }
+  },
+  "searchTracks": "Search tracks",
+  "menu": "Menu",
+  "settings": "Settings",
+  "savedTexts": "Saved texts",
+  "titleArtistOrAlbum": "Title, artist, or album",
+  "forYou": "For you",
+  "tracks": "Tracks",
+  "folders": "Folders",
+  "albums": "Albums",
+  "dismissNotice": "Dismiss notice",
+  "audioPermissionTitle": "Start listening to your music",
+  "audioPermissionNotice": "Allow access to audio files to find music on your device. The app keeps your files on this device.",
+  "allowAudioAccess": "Allow audio access",
+  "openAppPermissions": "Open app permissions",
+  "atYourOwnPace": "AT YOUR OWN PACE",
+  "libraryHeadline": "Your music.\nAlways with you.",
+  "librarySubtitle": "Listen to your files, even offline.",
+  "yourActivity": "Your activity",
+  "myFavorites": "My favorites",
+  "recentlyPlayed": "Recently played",
+  "mostPlayed": "Most played",
+  "emptyHistoryHint": "Tracks appear here after 30 seconds of listening or halfway through a short track.",
+  "yourCollection": "Your collection",
+  "recentlyAdded": "Recently added",
+  "myPlaylists": "My playlists",
+  "createPlaylist": "Create playlist",
+  "emptyPlaylistsHint": "Create a playlist to organize your tracks.",
+  "yourFolders": "Your folders",
+  "yourAlbums": "Your albums",
+  "recentlyAddedFirst": "Recently added first",
+  "play": "Play",
+  "shuffle": "Shuffle",
+  "editPlaylist": "Edit playlist",
+  "playlistCover": "Playlist cover",
+  "useFirstTrack": "Use first track",
+  "deletePlaylist": "Delete playlist?",
+  "deletePlaylistNotice": "The audio files will remain on your device.",
+  "delete": "Delete",
+  "rename": "Rename",
+  "changeCover": "Change cover",
+  "deletePlaylistAction": "Delete playlist",
+  "addTracks": "Add tracks",
+  "searchThisList": "Search this list",
+  "originalOrder": "Original order",
+  "sortByTitle": "Sort by title",
+  "noTracksYet": "No tracks yet",
+  "emptyRecentlyAddedHint": "No audio files from the last 90 days.",
+  "emptyCollectionHint": "Add tracks or listen to your library to fill this list.",
+  "removeFromPlaylist": "Remove from playlist",
+  "dragToReorder": "Drag to reorder",
+  "pause": "Pause",
+  "openQueue": "Open queue",
+  "backToLibrary": "Back to library",
+  "nowPlaying": "NOW PLAYING",
+  "sleepTimer": "Sleep timer",
+  "music": "Music",
+  "lyrics": "Lyrics",
+  "meaning": "Meaning",
+  "chooseATrack": "Choose a track",
+  "chooseTrackHint": "Select a track from the library.",
+  "playbackWillPauseAt": "Playback will pause at {time}.",
+  "@playbackWillPauseAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelSleepTimer": "Cancel sleep timer",
+  "favoriteTrack": "Favorite track",
+  "toggleShuffle": "Toggle shuffle",
+  "previousTrack": "Previous track",
+  "nextTrack": "Next track",
+  "repeatOff": "Repeat off",
+  "repeatAll": "Repeat all",
+  "repeatOne": "Repeat one",
+  "upNext": "Up next",
+  "playQueue": "Play queue",
+  "closeQueue": "Close queue",
+  "serverAddress": "Server address",
+  "apiUrl": "API URL",
+  "invalidApiUrl": "Enter a valid {scheme} URL.",
+  "@invalidApiUrl": {
+    "placeholders": {
+      "scheme": {
+        "type": "String"
+      }
+    }
+  },
+  "save": "Save",
+  "appearance": "Appearance",
+  "darkerTheme": "Darker theme",
+  "blackWithBlueAccents": "Black with blue accents",
+  "navyBlueAndBlack": "Navy blue and black",
+  "coverArtBackground": "Cover art background",
+  "playerAndPlaylistDetails": "Player and playlist details",
+  "textSize": "Text size · {size}",
+  "@textSize": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
+  "textSizeAccessibility": "Text size {size}",
+  "@textSizeAccessibility": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
+  "storageUsedAndOfflineReading": "Storage used and offline reading",
+  "localLibrary": "Local library",
+  "localStorageNotice": "Music is read from your device. Playlists, favorites, history, the play queue, and downloaded texts are stored on this device.",
+  "appPermissions": "App permissions",
+  "clearListeningHistory": "Clear listening history?",
+  "clearListeningHistoryNotice": "Favorites and playlists will be kept.",
+  "stopPlayback": "Stop playback",
+  "textSearch": "Text search",
+  "useDjangoServer": "Use Django server",
+  "djangoSearchDescription": "Search through the configured API",
+  "directSearchDescription": "Search directly using the device's internet connection",
+  "changeAddress": "Change address",
+  "connectionUnchecked": "Connection unchecked",
+  "checkingConnection": "Checking connection…",
+  "serverConnected": "Server connected",
+  "serverUnavailableOrNoConnection": "Server unavailable or no connection",
+  "invalidServerResponse": "Invalid server response",
+  "checkConnection": "Check connection",
+  "removeSavedTexts": "Remove saved texts?",
+  "remove": "Remove",
+  "savedTextRemoveFailed": "Couldn't remove the texts.",
+  "storageReadFailed": "Couldn't read storage.",
+  "emptySavedTextsHint": "No saved texts. Use Save offline in the player when the source allows it.",
+  "removeTextsFor": "Remove texts for {title}",
+  "@removeTextsFor": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "coverArtFor": "Cover art for {title}",
+  "@coverArtFor": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteFromThisDevice": "Delete from this device?",
+  "deleteFileNotice": "The file “{title}” will be permanently deleted.",
+  "@deleteFileNotice": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteFile": "Delete",
+  "trackDeletedFromThisDevice": "Track deleted from this device.",
+  "deleteFileFailed": "Couldn't delete the file.",
+  "fileUnavailable": "File unavailable",
+  "localFile": "Local file",
+  "optionsFor": "Options for {title}",
+  "@optionsFor": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "close": "Close",
+  "removeFromFavorites": "Remove from favorites",
+  "addToFavorites": "Add to favorites",
+  "details": "Details",
+  "deleteFromDevice": "Delete from device",
+  "newPlaylist": "New playlist",
+  "renamePlaylist": "Rename playlist",
+  "name": "Name",
+  "addedTo": "Added to {name}",
+  "@addedTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "alreadyAdded": "Already added",
+  "add": "Add ({count})",
+  "@add": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "startupFailed": "Couldn't start {name}. Close the app and try again.",
+  "@startupFailed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackChannel": "Music playback",
+  "appLanguage": "Language",
+  "systemLanguage": "Device language",
+  "selectedTracks": "{count, plural, one{1 selected} other{{count} selected}}",
+  "@selectedTracks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trackCount": "{count, plural, one{1 track} other{{count} tracks}}",
+  "@trackCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tracksInQueue": "{count, plural, one{1 track in the queue} other{{count} tracks in the queue}}",
+  "@tracksInQueue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutes": "{count} minutes",
+  "@minutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "meaningNotFound": "No meaning was found for this track.",
+  "lyricsNotFoundForTrack": "No lyrics were found for this track.",
+  "originalLanguage": "original (unspecified by the source)",
+  "storageUsage": "{used} of {limit}",
+  "@storageUsage": {
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "unknownArtist": "Unknown artist",
+  "unknownAlbum": "Unknown album",
+  "localDataReadFailed": "Couldn't open local data. Try restarting the app.",
+  "queueFilesMissing": "The queue was updated because some files are no longer available.",
+  "libraryRefreshFailed": "Couldn't refresh the library. Check permissions and try again.",
+  "trackUnavailable": "This track is unavailable. Refresh the library or allow audio access.",
+  "localDataSaveFailed": "Couldn't save local data. Check available storage.",
+  "playbackFileFailed": "Couldn't play this file. It may have been removed or corrupted.",
+  "playbackFailed": "Couldn't start playback. Check the file and audio permission.",
+  "playbackInterrupted": "Playback was interrupted. Try selecting another track.",
+  "textSearchLimit": "Search limit reached. Try again shortly.",
+  "textSearchExpired": "The search expired. Try again.",
+  "textSearchInvalid": "Check the title, artist, and duration.",
+  "serverSearchFailed": "The server couldn't complete the search.",
+  "sourceQueryLimit": "The source reached its request limit. Try again shortly.",
+  "sourceTryLater": "The source is unavailable. Try again later.",
+  "textServerOffline": "No connection to the text server.",
+  "textSearchTimeout": "The search timed out. Try again.",
+  "sourceRequestedPause": "The source asked for a pause between searches. Try again shortly.",
+  "sourceBusy": "The source is busy. Try again shortly.",
+  "textSourceOffline": "No connection to the text source.",
+  "offlineSavingUnavailable": "This source doesn't allow offline saving.",
+  "offlineStorageLimit": "The 20 MiB limit was reached. Remove a saved text in Settings.",
+  "downloadInterrupted": "The download was interrupted when the app closed.",
+  "savedMp3Unknown": "Couldn't identify the saved MP3.",
+  "downloadInvalid": "Invalid link.",
+  "downloadAndroidVersion": "Requires Android 10 or later.",
+  "downloadBusy": "A download is already in progress.",
+  "downloadBackground": "Open FologneMusic and try again.",
+  "conversionStorageFull": "Not enough storage to convert the track.",
+  "downloadCanceled": "Download canceled.",
+  "downloadNoAudio": "No audio is available for this link.",
+  "downloadConverterFailed": "Couldn't start the audio converter.",
+  "downloadStorageFull": "Not enough storage to save the track.",
+  "downloadConversionFailed": "Couldn't download or convert the audio. Check the connection and link.",
+  "downloadDuplicateFile": "This track is already in the FologneMusic folder.",
+  "untitled": "Untitled",
+  "previousTrackControl": "Previous",
+  "nextTrackControl": "Next"
+}

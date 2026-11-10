@@ -1,3 +1,5 @@
+import '../l10n/localization.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -14,7 +16,7 @@ Future<bool> confirmDownloadLink(
     await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Link do YouTube'),
+        title: Text(context.l10n.youtubeLink),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -22,20 +24,20 @@ Future<bool> confirmDownloadLink(
             SelectableText(link.toString()),
             if (available) ...[
               const SizedBox(height: 12),
-              const Text(
-                'Baixe apenas vídeos que você tem autorização para baixar e converter.',
-              ),
+              Text(context.l10n.downloadPermissionNotice),
             ],
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text(available ? 'Baixar MP3' : 'Confirmar'),
+            child: Text(
+              available ? context.l10n.downloadMp3 : context.l10n.confirm,
+            ),
           ),
         ],
       ),
@@ -58,7 +60,7 @@ class _AudioDownloadsScreenState extends State<AudioDownloadsScreen> {
   Future<void> _submit() async {
     final link = youtubeVideoLink(_input.text);
     if (link == null) {
-      setState(() => _error = 'Cole o link de um vídeo do YouTube.');
+      setState(() => _error = context.l10n.invalidYoutubeLink);
       return;
     }
     if (!await confirmDownloadLink(context, link, available: true) ||
@@ -66,10 +68,11 @@ class _AudioDownloadsScreenState extends State<AudioDownloadsScreen> {
       return;
     }
     if (widget.queue.enqueue(link)) {
+      widget.queue.requestNotifications().ignore();
       _input.clear();
       setState(() => _error = null);
     } else {
-      setState(() => _error = 'Este link já está na fila ou no histórico.');
+      setState(() => _error = context.l10n.duplicateDownloadLink);
     }
   }
 
@@ -83,7 +86,7 @@ class _AudioDownloadsScreenState extends State<AudioDownloadsScreen> {
     }
     if (track == null || !track.available || !state.permitted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Arquivo indisponível na biblioteca.')),
+        SnackBar(content: Text(context.l10n.downloadFileUnavailable)),
       );
       return;
     }
@@ -95,16 +98,16 @@ class _AudioDownloadsScreenState extends State<AudioDownloadsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Limpar histórico de downloads?'),
-        content: const Text('Os MP3 salvos continuam na biblioteca.'),
+        title: Text(context.l10n.clearDownloadHistory),
+        content: Text(context.l10n.clearDownloadHistoryNotice),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Limpar'),
+            child: Text(context.l10n.clear),
           ),
         ],
       ),
@@ -132,16 +135,14 @@ class _AudioDownloadsScreenState extends State<AudioDownloadsScreen> {
             sliver: SliverList.list(
               children: [
                 Text(
-                  'Baixar MP3',
+                  context.l10n.downloadMp3,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 12),
                 if (!queue.ready)
                   const LinearProgressIndicator()
                 else if (!queue.available)
-                  const Text(
-                    'O download de áudio está disponível no APK experimental em aparelhos compatíveis.',
-                  )
+                  Text(context.l10n.downloadsUnavailable)
                 else ...[
                   TextField(
                     controller: _input,
@@ -152,10 +153,10 @@ class _AudioDownloadsScreenState extends State<AudioDownloadsScreen> {
                       if (_error != null) setState(() => _error = null);
                     },
                     decoration: InputDecoration(
-                      labelText: 'Link do YouTube',
+                      labelText: context.l10n.youtubeLink,
                       errorText: _error,
                       suffixIcon: IconButton(
-                        tooltip: 'Colar link',
+                        tooltip: context.l10n.pasteLink,
                         icon: const Icon(Icons.content_paste),
                         onPressed: () async {
                           final clipboard = await Clipboard.getData(
@@ -172,32 +173,29 @@ class _AudioDownloadsScreenState extends State<AudioDownloadsScreen> {
                   FilledButton.icon(
                     onPressed: _submit,
                     icon: const Icon(Icons.download),
-                    label: const Text('Adicionar à fila'),
+                    label: Text(context.l10n.addToQueue),
                   ),
                 ],
                 if (queue.historyError)
-                  const Text(
-                    'Não foi possível acessar o histórico de downloads.',
-                  ),
+                  Text(context.l10n.downloadHistoryUnavailable),
                 const SizedBox(height: 20),
                 Row(
                   children: [
                     Expanded(
                       child: Text(
-                        'Fila e histórico',
+                        context.l10n.queueAndHistory,
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                     ),
                     if (entries.any((entry) => entry.finished))
                       IconButton(
-                        tooltip: 'Limpar histórico',
+                        tooltip: context.l10n.clearHistory,
                         onPressed: _clearHistory,
                         icon: const Icon(Icons.delete_outline),
                       ),
                   ],
                 ),
-                if (entries.isEmpty)
-                  const Text('Nenhum download por enquanto.'),
+                if (entries.isEmpty) Text(context.l10n.noDownloadsYet),
               ],
             ),
           ),
@@ -216,32 +214,35 @@ class _AudioDownloadsScreenState extends State<AudioDownloadsScreen> {
   Widget _downloadTile(AudioDownload entry) {
     final progress = entry.progress;
     final status = switch (entry.status) {
-      AudioDownloadStatus.waiting => 'Na fila',
+      AudioDownloadStatus.waiting => context.l10n.queued,
       AudioDownloadStatus.running when progress == 100 =>
-        'Convertendo e salvando MP3…',
+        context.l10n.convertingAndSavingMp3,
       AudioDownloadStatus.running when progress != null =>
-        'Baixando áudio · $progress%',
-      AudioDownloadStatus.running => 'Preparando download…',
-      AudioDownloadStatus.canceling => 'Cancelando…',
-      AudioDownloadStatus.completed => 'Concluído',
-      AudioDownloadStatus.failed => entry.error ?? 'Falha no download.',
-      AudioDownloadStatus.canceled => 'Cancelado',
+        context.l10n.downloadingAudio(progress),
+      AudioDownloadStatus.running => context.l10n.preparingDownload,
+      AudioDownloadStatus.canceling => context.l10n.canceling,
+      AudioDownloadStatus.completed => context.l10n.completed,
+      AudioDownloadStatus.failed =>
+        entry.error == null
+            ? context.l10n.downloadFailed
+            : context.localizedMessage(entry.error!),
+      AudioDownloadStatus.canceled => context.l10n.canceled,
     };
     final action = switch (entry.status) {
       AudioDownloadStatus.waiting || AudioDownloadStatus.running => IconButton(
-        tooltip: 'Cancelar download',
+        tooltip: context.l10n.cancelDownload,
         onPressed: () => widget.queue.cancel(entry),
         icon: const Icon(Icons.close),
       ),
       AudioDownloadStatus.failed || AudioDownloadStatus.canceled => IconButton(
-        tooltip: 'Tentar novamente',
+        tooltip: context.l10n.tryAgain,
         onPressed: widget.queue.available
             ? () => widget.queue.retry(entry)
             : null,
         icon: const Icon(Icons.refresh),
       ),
       AudioDownloadStatus.completed => IconButton(
-        tooltip: 'Reproduzir MP3',
+        tooltip: context.l10n.playMp3,
         onPressed: () => _play(entry),
         icon: const Icon(Icons.play_arrow),
       ),

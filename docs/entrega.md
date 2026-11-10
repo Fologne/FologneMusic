@@ -1,5 +1,20 @@
 # Entrega do FologneMusic
 
+## Versão 2.1.0
+
+O APK assinado `FologneMusic-2.1.0.apk` atualiza a fila de reprodução, acrescenta português e inglês à interface e abre os downloads compartilhados em uma janela. Ele usa o mesmo identificador Android e a mesma chave de assinatura.
+
+| Item | Valor |
+| --- | --- |
+| Código de versão | 20 |
+| Tamanho | 128.623.205 bytes |
+| SHA-256 do APK | `7bdc393dd0c3fd30d9f1307e5680990d78314015f158458f817ec7e22c857c6b` |
+| SHA-256 do certificado | `f2921d73b8caa843456b9fb36efae838e27723135d7e556a1f57f66eaf7a9a21` |
+| Versões do Android | Android 7.0 para reprodução e Android 10 para downloads |
+| ABIs | `arm64-v8a` e `x86_64` |
+
+Use `FologneMusic-2.1.0.apk` na release `v2.1.0`. Os componentes de download empacotados são os mesmos da 2.0.0. A revisão de fontes e avisos está registrada na seção [Licenças e código-fonte](#licenças-e-código-fonte).
+
 ## Versão 2.0.0
 
 O APK `FologneMusic-2.0.0.apk` usa o identificador `com.musicapp.music_app`, a chave da versão 1.0.0 e o código de versão 16. A fila de reprodução mostra a ordem do modo aleatório e restaura essa ordem ao reabrir o app. A aba **Downloads** usa a mesma fila para links compartilhados e colados. Seu histórico fica separado do SQLite da biblioteca. Limpar o histórico mantém os MP3 salvos em `Music/FologneMusic`.

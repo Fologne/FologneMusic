@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart' show Locale;
 import 'package:just_audio/just_audio.dart';
 
+import '../l10n/localization.dart';
 import '../library/models.dart';
 import '../library/media_library.dart';
 
@@ -14,8 +16,10 @@ class MusicHandler extends BaseAudioHandler {
   Future<void> _pending = Future.value();
   Timer? _sleepTimer;
   int _artworkRequest = 0;
+  AppLocalizations _strings;
 
-  MusicHandler() {
+  MusicHandler({AppLocalizations? strings})
+    : _strings = strings ?? lookupAppLocalizations(const Locale('en')) {
     engine.playbackEventStream.listen((_) => _broadcast());
     engine.playerStateStream.listen((state) {
       _broadcast();
@@ -52,6 +56,27 @@ class MusicHandler extends BaseAudioHandler {
     await session.configure(const AudioSessionConfiguration.music());
   }
 
+  void setLocale(Locale locale) {
+    final strings = lookupAppLocalizations(locale);
+    if (strings.localeName == _strings.localeName) return;
+    _strings = strings;
+    final index = engine.currentIndex;
+    final current = mediaItem.value;
+    if (current != null && index != null && index < queue.value.length) {
+      mediaItem.add(
+        _localizedItem(queue.value[index])
+            .copyWith(artUri: current.artUri, duration: current.duration),
+      );
+    }
+    _broadcast();
+  }
+
+  MediaItem _localizedItem(MediaItem item) => item.copyWith(
+    title: localizeMessage(_strings, item.title),
+    artist: localizeMessage(_strings, item.artist ?? ''),
+    album: localizeMessage(_strings, item.album ?? ''),
+  );
+
   void _syncItem() {
     final index = engine.currentIndex;
     if (index != null && index < queue.value.length) {
@@ -63,7 +88,7 @@ class MusicHandler extends BaseAudioHandler {
   void _publishItem(MediaItem item) {
     if (mediaItem.value?.id == item.id) return;
     final request = ++_artworkRequest;
-    mediaItem.add(item);
+    mediaItem.add(_localizedItem(item));
     unawaited(_loadArtwork(item.id, request));
   }
 
@@ -83,12 +108,16 @@ class MusicHandler extends BaseAudioHandler {
     playbackState.add(
       playbackState.value.copyWith(
         controls: [
-          MediaControl.skipToPrevious,
-          engine.playing ? MediaControl.pause : MediaControl.play,
-          MediaControl.skipToNext,
-          const MediaControl(
+          MediaControl.skipToPrevious.copyWith(
+            label: _strings.previousTrackControl,
+          ),
+          engine.playing
+              ? MediaControl.pause.copyWith(label: _strings.pause)
+              : MediaControl.play.copyWith(label: _strings.play),
+          MediaControl.skipToNext.copyWith(label: _strings.nextTrackControl),
+          MediaControl(
             androidIcon: 'drawable/ic_close_playback',
-            label: 'Parar reprodução',
+            label: _strings.stopPlayback,
             action: MediaAction.stop,
           ),
         ],
@@ -191,12 +220,21 @@ class MusicHandler extends BaseAudioHandler {
   @override
   Future<void> setShuffleMode(AudioServiceShuffleMode shuffleMode) =>
       _guard(() async {
-        if (shuffleMode != AudioServiceShuffleMode.none) await engine.shuffle();
+        if (shuffleMode != AudioServiceShuffleMode.none) await _syncShuffle();
         await engine.setShuffleModeEnabled(
           shuffleMode != AudioServiceShuffleMode.none,
         );
         _broadcast();
       });
+  Future<void> _syncShuffle() async {
+    await engine.shuffle();
+    // just_audio 0.10.6 only sends the top-level order to Android on playlist
+    // mutations. An empty range sends it without touching any audio source.
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      await engine.removeAudioSourceRange(0, 0);
+    }
+  }
+
   @override
   Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) =>
       _guard(() async {
@@ -279,7 +317,7 @@ class MusicHandler extends BaseAudioHandler {
                 restoredOrder != null && restoredOrder.length == tracks.length
                 ? restoredOrder.toList()
                 : null;
-            await engine.shuffle();
+            await _syncShuffle();
           }
           await engine.setShuffleModeEnabled(shuffle);
           _broadcast();
@@ -299,7 +337,7 @@ class MusicHandler extends BaseAudioHandler {
             if (order.length != items.length) return;
             order.insert(to, order.removeAt(from));
             _shuffleOrder.next = order;
-            await engine.shuffle();
+            await _syncShuffle();
             return;
           }
           items.insert(to, items.removeAt(from));

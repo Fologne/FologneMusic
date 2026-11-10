@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:music_app/core/theme.dart';
 import 'package:music_app/features/library_screen.dart';
+import 'package:music_app/l10n/localization.dart';
 import 'package:music_app/library/music_controller.dart';
 import 'package:music_app/main.dart';
 import 'package:music_app/widgets/common.dart';
@@ -11,6 +12,11 @@ import 'support/fakes.dart';
 
 void main() {
   WidgetController.hitTestWarningShouldBeFatal = true;
+  void useDeviceLocales(WidgetTester tester, List<Locale> locales) {
+    tester.binding.platformDispatcher.localesTestValue = locales;
+    addTearDown(tester.binding.platformDispatcher.clearLocalesTestValue);
+  }
+
   Future<MusicController> controller({
     bool allowed = true,
     List<Track>? rows,
@@ -21,6 +27,7 @@ void main() {
       media: media,
       store: MemoryStore(),
       handler: FakeHandler(),
+      language: AppLanguage.pt,
     );
     await state.initialize();
     addTearDown(state.dispose);
@@ -36,6 +43,9 @@ void main() {
       MusicScope(
         controller: state,
         child: MaterialApp(
+          locale: const Locale('pt'),
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
           home: Scaffold(
             body: Builder(
               builder: (context) => TextButton(
@@ -124,6 +134,9 @@ void main() {
       MusicScope(
         controller: state,
         child: MaterialApp(
+          locale: const Locale('pt'),
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
           theme: buildTheme(),
           home: CollectionScreen(
             title: playlist.name,
@@ -156,6 +169,105 @@ void main() {
     await gesture.up();
     await tester.pumpAndSettle();
     expect(playlist.trackIds, [testTracks.last.id, testTracks.first.id]);
+    state.dispose();
+  });
+
+  testWidgets('idioma primário do aparelho e preferência manual', (
+    tester,
+  ) async {
+    useDeviceLocales(tester, [const Locale('pt', 'BR')]);
+    String? savedLanguage;
+    MusicController createState([AppLanguage language = AppLanguage.system]) {
+      final state = MusicController(
+        media: FakeMedia(),
+        store: MemoryStore(),
+        handler: FakeHandler(),
+        language: language,
+        persistLanguage: (value) async => savedLanguage = value.name,
+      );
+      return state;
+    }
+
+    final state = createState();
+    await tester.pumpWidget(MusicApp(controller: state));
+    await tester.pumpAndSettle();
+    expect(find.text('Faixas'), findsOneWidget);
+    tester.binding.platformDispatcher.localesTestValue = [
+      const Locale('pt', 'PT'),
+    ];
+    await tester.pumpAndSettle();
+    expect(find.text('Faixas'), findsOneWidget);
+    tester.binding.platformDispatcher.localesTestValue = [
+      const Locale('es', 'ES'),
+      const Locale('pt', 'BR'),
+    ];
+    await tester.pumpAndSettle();
+    expect(find.text('Tracks'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Menu'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Device language'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Português').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Configurações'), findsOneWidget);
+    expect(savedLanguage, 'pt');
+
+    await tester.pumpWidget(const SizedBox());
+    state.dispose();
+    final restored = createState(AppLanguage.fromPreference(savedLanguage));
+    await tester.pumpWidget(MusicApp(controller: restored));
+    await tester.pumpAndSettle();
+    expect(find.text('Faixas'), findsOneWidget);
+    await restored.setLanguage(AppLanguage.system);
+    await tester.pumpAndSettle();
+    expect(find.text('Tracks'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    restored.dispose();
+  });
+
+  testWidgets('fila abre e acompanha a faixa atual sem mudar a ordem', (
+    tester,
+  ) async {
+    final tracks = List.generate(
+      14,
+      (index) => Track.fromJson({
+        ...testTracks.first.toJson(),
+        'id': 'queue-$index',
+        'title': 'Faixa $index',
+      }),
+    );
+    final state = await controller(rows: tracks);
+    final order = tracks.reversed.toList();
+    await state.select(order[7], from: tracks, random: true);
+    (state.handler as FakeHandler).customState.add(
+      order.map((track) => track.id).toList(),
+    );
+    await tester.pumpWidget(MusicApp(controller: state));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Abrir fila'));
+    await tester.pumpAndSettle();
+
+    final list = find.byType(ReorderableListView);
+    void expectAtTop(Track track) {
+      final tile = find.descendant(
+        of: list,
+        matching: find.byKey(ValueKey(track.id)),
+      );
+      expect(
+        tester.getTopLeft(tile).dy,
+        closeTo(tester.getTopLeft(list).dy, 1),
+      );
+    }
+
+    expectAtTop(order[7]);
+    (state.handler as FakeHandler).mediaItem.add(order.last.toMediaItem());
+    await tester.pumpAndSettle();
+    expectAtTop(order.last);
+    expect(state.playbackQueue, order);
+    await tester.pumpWidget(const SizedBox());
     state.dispose();
   });
 
@@ -267,6 +379,7 @@ void main() {
       media: media,
       store: MemoryStore(),
       handler: FakeHandler(),
+      language: AppLanguage.pt,
     );
     addTearDown(state.dispose);
     await state.initialize();

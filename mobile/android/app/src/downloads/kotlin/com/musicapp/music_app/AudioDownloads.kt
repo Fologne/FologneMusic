@@ -44,6 +44,10 @@ internal fun registerAudioDownloads(context: Context, messenger: BinaryMessenger
                 } else result.notImplemented()
             }
             "cancel" -> result.success(AudioDownloads.cancel())
+            "idle" -> {
+                DownloadService.idle()
+                result.success(null)
+            }
             else -> result.notImplemented()
         }
     }
@@ -65,6 +69,9 @@ private object AudioDownloads {
     fun start(context: Context, url: String, id: String, channel: MethodChannel, result: MethodChannel.Result) {
         val job = synchronized(lock) {
             if (active != null) return result.error("busy", "Já há um download em andamento.", null)
+            if (id != "fixture" && runCatching { DownloadService.start(context) }.isFailure) {
+                return result.error("background", "Abra o FologneMusic e tente novamente.", null)
+            }
             Job().also { active = it }
         }
         worker.execute {
@@ -112,7 +119,13 @@ private object AudioDownloads {
                     if (job.canceled) throw DownloadFailure("canceled", "Download cancelado.")
                     job.committing = true
                 }
-                savedTrack = publish(context, mp3, name)
+                val track = publish(context, mp3, name)
+                savedTrack = track
+                runCatching {
+                    DownloadNotifications.completed(
+                        context, track.getValue("trackId"), track.getValue("title")
+                    )
+                }
             } catch (error: LinkageError) {
                 android.util.Log.e("FologneDownloads", "Download engine failed to initialize", error)
                 failure = DownloadFailure("engine", "Não foi possível iniciar o conversor de áudio.")

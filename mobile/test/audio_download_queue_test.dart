@@ -52,9 +52,10 @@ void main() {
         channel: channel,
       );
       await queue.initialize();
-      expect(queue.enqueue(first), isTrue);
-      expect(queue.enqueue(second), isTrue);
-      expect(queue.enqueue(second), isFalse);
+      expect(queue.enqueueShared('texto sem link'), 'invalid');
+      expect(queue.enqueueShared(first.toString()), 'started');
+      expect(queue.enqueueShared('https://youtu.be/LkMNopQ1234'), 'queued');
+      expect(queue.enqueueShared(second.toString()), 'duplicate');
       expect(starts, [first.toString()]);
       final queued = queue.entries.last;
       expect(queued.status, AudioDownloadStatus.waiting);

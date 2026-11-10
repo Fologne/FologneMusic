@@ -9,6 +9,7 @@ import '../content/text_store.dart';
 import '../content/content_api.dart';
 import '../content/direct_content_api.dart';
 import '../core/app_info.dart';
+import '../l10n/localization.dart';
 import 'media_library.dart';
 import 'models.dart';
 import 'music_store.dart';
@@ -22,11 +23,24 @@ class MusicController extends ChangeNotifier {
     required this.store,
     required this.handler,
     this.downloads,
+    this._language = AppLanguage.system,
+    this.persistLanguage,
   });
   final MediaLibrary media;
   final MusicStore store;
   final AudioHandler handler;
   final TextStore? downloads;
+  final Future<void> Function(AppLanguage)? persistLanguage;
+  AppLanguage _language;
+  AppLanguage get language => _language;
+
+  Future<void> setLanguage(AppLanguage value) async {
+    if (_language == value) return;
+    await persistLanguage?.call(value);
+    _language = value;
+    _notify();
+  }
+
   String apiBaseUrl = defaultApiBaseUrl;
   bool useDjango = defaultApiBaseUrl.isNotEmpty;
   final _directLookup = DirectContentApi();

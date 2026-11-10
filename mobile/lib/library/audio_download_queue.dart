@@ -125,6 +125,20 @@ class AudioDownloadQueue extends ChangeNotifier {
     return true;
   }
 
+  String enqueueShared(String text) {
+    final link = youtubeVideoLink(text);
+    if (link == null) return 'invalid';
+    if (!available) return 'unavailable';
+    final waiting = _active != null;
+    if (!enqueue(link)) return 'duplicate';
+    return waiting ? 'queued' : 'started';
+  }
+
+  Future<void> requestNotifications() =>
+      const MethodChannel('musicapp/media')
+          .invokeMethod<void>('requestDownloadNotifications')
+          .onError<MissingPluginException>((_, _) {});
+
   void retry(AudioDownload entry) {
     if (!available ||
         !entry.finished ||
@@ -204,6 +218,7 @@ class AudioDownloadQueue extends ChangeNotifier {
       _active = null;
       _changed();
       _startNext();
+      if (_active == null) channel.invokeMethod<void>('idle').ignore();
     }
   }
 

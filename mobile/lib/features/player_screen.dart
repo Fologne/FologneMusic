@@ -1,8 +1,11 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../content/content_api.dart';
 import '../content/text_store.dart';
 import '../core/theme.dart';
+import '../l10n/localization.dart';
 import '../library/music_controller.dart';
 import '../widgets/common.dart';
 import '../widgets/playlist_actions.dart';
@@ -62,7 +65,7 @@ class MiniPlayer extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  track.artist,
+                                  context.localizedMessage(track.artist),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
@@ -79,7 +82,9 @@ class MiniPlayer extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  tooltip: state.playing ? 'Pausar' : 'Reproduzir',
+                  tooltip: state.playing
+                      ? context.l10n.pause
+                      : context.l10n.play,
                   onPressed: state.permitted ? state.togglePlaying : null,
                   icon: Icon(
                     state.playing
@@ -88,7 +93,7 @@ class MiniPlayer extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Abrir fila',
+                  tooltip: context.l10n.openQueue,
                   onPressed: () => openQueue(context),
                   icon: const Icon(Icons.queue_music_rounded),
                 ),
@@ -121,13 +126,13 @@ class PlayerScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       IconButton(
-                        tooltip: 'Voltar à biblioteca',
+                        tooltip: context.l10n.backToLibrary,
                         onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.keyboard_arrow_down_rounded),
                       ),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'TOCANDO AGORA',
+                          context.l10n.nowPlaying,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 11,
@@ -137,7 +142,7 @@ class PlayerScreen extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        tooltip: 'Temporizador',
+                        tooltip: context.l10n.sleepTimer,
                         onPressed: () => _openSleepTimer(context, state),
                         icon: Icon(
                           state.sleepUntil == null
@@ -149,27 +154,27 @@ class PlayerScreen extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        tooltip: 'Abrir fila',
+                        tooltip: context.l10n.openQueue,
                         onPressed: () => openQueue(context),
                         icon: const Icon(Icons.queue_music_rounded),
                       ),
                     ],
                   ),
                 ),
-                const TabBar(
+                TabBar(
                   isScrollable: true,
                   tabAlignment: TabAlignment.center,
                   tabs: [
-                    Tab(text: 'Música'),
-                    Tab(text: 'Letra'),
-                    Tab(text: 'Significado'),
+                    Tab(text: context.l10n.music),
+                    Tab(text: context.l10n.lyrics),
+                    Tab(text: context.l10n.meaning),
                   ],
                 ),
                 if (state.error != null)
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      state.error!,
+                      context.localizedMessage(state.error!),
                       style: const TextStyle(color: AppColors.accent),
                     ),
                   ),
@@ -179,10 +184,10 @@ class PlayerScreen extends StatelessWidget {
                       MusicTab(key: ValueKey(state.current?.id)),
                       for (final kind in TextKind.values)
                         if (track == null)
-                          const Notice(
+                          Notice(
                             icon: Icons.music_note,
-                            title: 'Escolha uma música',
-                            message: 'Selecione uma faixa na biblioteca.',
+                            title: context.l10n.chooseATrack,
+                            message: context.l10n.chooseTrackHint,
                           )
                         else
                           ContentTab(
@@ -213,19 +218,22 @@ Future<void> _openSleepTimer(
         shrinkWrap: true,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         children: [
-          const SectionTitle('Temporizador'),
+          SectionTitle(context.l10n.sleepTimer),
           if (state.sleepUntil case final DateTime until)
             Text(
-              'Pausa programada para ${MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(until))}.',
+              context.l10n.playbackWillPauseAt(
+                MaterialLocalizations.of(context)
+                    .formatTimeOfDay(TimeOfDay.fromDateTime(until)),
+              ),
             ),
           for (final minutes in [5, 15, 30, 45, 60])
             ListTile(
-              title: Text('$minutes minutos'),
+              title: Text(context.l10n.minutes(minutes)),
               onTap: () => Navigator.pop(context, minutes),
             ),
           if (state.sleepUntil != null)
             ListTile(
-              title: const Text('Cancelar temporizador'),
+              title: Text(context.l10n.cancelSleepTimer),
               onTap: () => Navigator.pop(context, 0),
             ),
         ],
@@ -250,10 +258,10 @@ class _MusicTabState extends State<MusicTab> {
     final state = MusicScope.of(context);
     final track = state.current;
     if (track == null) {
-      return const Notice(
+      return Notice(
         icon: Icons.music_note,
-        title: 'Escolha uma música',
-        message: 'Selecione uma faixa na biblioteca.',
+        title: context.l10n.chooseATrack,
+        message: context.l10n.chooseTrackHint,
       );
     }
     final position = (dragging ?? state.position).clamp(0.0, state.duration);
@@ -281,7 +289,7 @@ class _MusicTabState extends State<MusicTab> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        track.artist,
+                        context.localizedMessage(track.artist),
                         style: const TextStyle(
                           color: AppColors.muted,
                           fontSize: 16,
@@ -291,7 +299,7 @@ class _MusicTabState extends State<MusicTab> {
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Favoritar música',
+                  tooltip: context.l10n.favoriteTrack,
                   onPressed: () => state.toggleFavorite(track),
                   icon: Icon(
                     state.favorites.contains(track.id)
@@ -340,7 +348,7 @@ class _MusicTabState extends State<MusicTab> {
               spacing: 4,
               children: [
                 IconButton(
-                  tooltip: 'Alternar aleatório',
+                  tooltip: context.l10n.toggleShuffle,
                   onPressed: state.toggleShuffle,
                   icon: Icon(
                     Icons.shuffle,
@@ -348,13 +356,15 @@ class _MusicTabState extends State<MusicTab> {
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Música anterior',
+                  tooltip: context.l10n.previousTrack,
                   onPressed: () => state.skip(-1),
                   icon: const Icon(Icons.skip_previous_rounded, size: 36),
                 ),
                 IconButton.filled(
                   key: const Key('player-toggle'),
-                  tooltip: state.playing ? 'Pausar' : 'Reproduzir',
+                  tooltip: state.playing
+                      ? context.l10n.pause
+                      : context.l10n.play,
                   style: IconButton.styleFrom(minimumSize: const Size(72, 72)),
                   onPressed: state.permitted ? state.togglePlaying : null,
                   icon: Icon(
@@ -365,15 +375,15 @@ class _MusicTabState extends State<MusicTab> {
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Próxima música',
+                  tooltip: context.l10n.nextTrack,
                   onPressed: () => state.skip(1),
                   icon: const Icon(Icons.skip_next_rounded, size: 36),
                 ),
                 IconButton(
                   tooltip: [
-                    'Repetição desligada',
-                    'Repetir todas',
-                    'Repetir uma',
+                    context.l10n.repeatOff,
+                    context.l10n.repeatAll,
+                    context.l10n.repeatOne,
                   ][state.repeat],
                   onPressed: state.cycleRepeat,
                   icon: Icon(
@@ -389,14 +399,14 @@ class _MusicTabState extends State<MusicTab> {
             OutlinedButton.icon(
               onPressed: () => addTracksToPlaylist(context, [track]),
               icon: const Icon(Icons.playlist_add),
-              label: const Text('Adicionar à playlist'),
+              label: Text(context.l10n.addToPlaylist),
             ),
             const SizedBox(height: 24),
             const Divider(),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('A seguir'),
-              subtitle: Text('${musicCount(state.queue.length)} na fila'),
+              title: Text(context.l10n.upNext),
+              subtitle: Text(context.l10n.tracksInQueue(state.queue.length)),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => openQueue(context),
             ),
@@ -410,9 +420,55 @@ class _MusicTabState extends State<MusicTab> {
 void openQueue(BuildContext context) => showModalBottomSheet<void>(
   context: context,
   isScrollControlled: true,
-  builder: (context) {
+  builder: (_) => const _QueueSheet(),
+);
+
+class _QueueSheet extends StatefulWidget {
+  const _QueueSheet();
+
+  @override
+  State<_QueueSheet> createState() => _QueueSheetState();
+}
+
+class _QueueSheetState extends State<_QueueSheet> {
+  ScrollController? _scroll;
+  String? _focusedTrack;
+  bool _dragging = false;
+
+  @override
+  void dispose() {
+    _scroll?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = MusicScope.of(context);
     final tracks = state.playbackQueue;
+    final currentId = state.current?.id;
+    final currentIndex = tracks.indexWhere((track) => track.id == currentId);
+    final scaler = MediaQuery.textScalerOf(context);
+    final rowHeight = math.max(
+      84.0,
+      scaler.scale(16) * 1.5 + scaler.scale(14) * 1.43 + 32,
+    );
+    final targetOffset = math.max(0, currentIndex) * rowHeight;
+    if (_scroll == null) {
+      _focusedTrack = currentId;
+      _scroll = ScrollController(
+        initialScrollOffset: targetOffset,
+        keepScrollOffset: false,
+      );
+    } else if (!_dragging && _focusedTrack != currentId) {
+      _focusedTrack = currentId;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || _dragging || _focusedTrack != currentId) return;
+        final scroll = _scroll!;
+        if (scroll.hasClients) {
+          scroll.jumpTo(targetOffset.clamp(0, scroll.position.maxScrollExtent));
+        }
+      });
+    }
     return SafeArea(
       child: SizedBox(
         height: MediaQuery.sizeOf(context).height * .65,
@@ -422,17 +478,17 @@ void openQueue(BuildContext context) => showModalBottomSheet<void>(
               padding: const EdgeInsets.fromLTRB(24, 0, 12, 12),
               child: Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Fila de reprodução',
-                      style: TextStyle(
+                      context.l10n.playQueue,
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                   IconButton(
-                    tooltip: 'Fechar fila',
+                    tooltip: context.l10n.closeQueue,
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(Icons.close),
                   ),
@@ -440,35 +496,49 @@ void openQueue(BuildContext context) => showModalBottomSheet<void>(
               ),
             ),
             Expanded(
-              child: ReorderableListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                itemCount: tracks.length,
-                onReorderItem: state.reorder,
-                buildDefaultDragHandles: false,
-                itemBuilder: (context, index) {
-                  final track = tracks[index];
-                  return TrackTile(
-                    key: ValueKey(track.id),
-                    track: track,
-                    onTap: () => state.selectInQueue(track),
-                    trailing: ReorderableDragStartListener(
-                      index: index,
-                      child: const SizedBox(
-                        width: 48,
-                        height: 48,
-                        child: Icon(
-                          Icons.drag_handle,
-                          semanticLabel: 'Arraste para reordenar',
+              child: LayoutBuilder(
+                builder: (context, constraints) => ReorderableListView.builder(
+                  scrollController: _scroll,
+                  itemExtent: rowHeight,
+                  // Leave enough room to align even the last track at the top.
+                  padding: EdgeInsets.fromLTRB(
+                    24,
+                    0,
+                    24,
+                    tracks.isEmpty
+                        ? 0
+                        : math.max(0, constraints.maxHeight - rowHeight),
+                  ),
+                  itemCount: tracks.length,
+                  onReorderItem: state.reorder,
+                  onReorderStart: (_) => _dragging = true,
+                  onReorderEnd: (_) => setState(() => _dragging = false),
+                  buildDefaultDragHandles: false,
+                  itemBuilder: (context, index) {
+                    final track = tracks[index];
+                    return TrackTile(
+                      key: ValueKey(track.id),
+                      track: track,
+                      onTap: () => state.selectInQueue(track),
+                      trailing: ReorderableDragStartListener(
+                        index: index,
+                        child: SizedBox(
+                          width: 48,
+                          height: 48,
+                          child: Icon(
+                            Icons.drag_handle,
+                            semanticLabel: context.l10n.dragToReorder,
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ],
         ),
       ),
     );
-  },
-);
+  }
+}

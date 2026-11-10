@@ -8,7 +8,7 @@ Player de músicas locais para Android, feito em Flutter. A busca de letras e si
 
 Requer Android 7.0 ou superior.
 
-1. Abra a página de [Releases](https://github.com/Fologne/FologneMusic/releases). Quando a 2.0.0 estiver publicada, baixe `FologneMusic-2.0.0.apk` em **Assets**.
+1. Abra a página de [Releases](https://github.com/Fologne/FologneMusic/releases) e baixe `FologneMusic-2.1.0.apk` em **Assets** da versão 2.1.0.
 2. Abra o APK em **Downloads** pelo gerenciador de arquivos do Android. Se o sistema solicitar, autorize a instalação a partir desse gerenciador e confirme.
 3. Abra o FologneMusic e conceda acesso ao áudio. O app carrega as músicas armazenadas no celular que o Android já catalogou.
 
@@ -19,7 +19,7 @@ Para atualizar, abra o APK de uma versão mais recente sobre a instalação exis
 - Biblioteca por faixas, pastas e álbuns, com busca por título, artista ou álbum, ordenação e índice alfabético.
 - Atualização da biblioteca ao abrir o app, voltar a ele ou puxar a lista para baixo. Também há um botão para atualizar.
 - Reprodução local em segundo plano, miniplayer, fila editável, avanço na faixa, modo aleatório e repetição. Os botões **Anterior** e **Próxima** seguem a fila com um toque.
-- A fila mostra a ordem real de reprodução no modo aleatório e restaura essa ordem ao reabrir o app.
+- A fila mostra a ordem real de reprodução, inclusive no modo aleatório. Ela abre com a faixa atual no topo, acompanha as trocas de faixa e restaura a ordem ao reabrir o app.
 - Controles na notificação e na tela bloqueada, com capa nas cores originais e botão X para parar a reprodução. O sistema define a cor do cartão.
 - Restauração da fila e da posição ao reabrir, com início da reprodução sob comando do usuário.
 - Criação e edição de playlists, com seleção múltipla de faixas na ordem dos toques, capas no seletor, reordenação por arraste com destaque em azul-marinho e capa escolhida entre as músicas da lista.
@@ -27,12 +27,13 @@ Para atualizar, abra o APK de uma versão mais recente sobre a instalação exis
 - Exclusão de músicas pelo menu da faixa, com confirmação.
 - Player com as abas **Música**, **Letra** e **Significado**, temporizador para pausar e opções de aparência.
 - Tema escuro azul-marinho e preto, com opção de fundo mais escuro, capa no fundo e ajuste do tamanho do texto.
+- Interface em português e inglês. O app começa em português quando esse é o idioma principal do dispositivo e em inglês nos demais casos. A escolha pode ser alterada em **Configurações → Idioma**.
 
 ## Downloads de áudio
 
-Disponível a partir do Android 10. No YouTube, toque em **Compartilhar** e escolha **FologneMusic**, ou cole o link na aba **Downloads**. Confirme em **Baixar MP3** para vídeos cujo download e conversão você tem autorização.
+Disponível a partir do Android 10. No YouTube, toque em **Compartilhar** e escolha **FologneMusic**. O download começa em uma janela sobre o YouTube. Toque em **OK** para voltar ao vídeo ou em **Ver download** para abrir a aba **Downloads**. Também é possível colar um link nessa aba. Baixe apenas vídeos que você tem autorização para baixar e converter.
 
-A aba mostra a fila, o progresso e o histórico local, com opções para cancelar, tentar novamente e reproduzir os arquivos concluídos. A conversão acontece no celular e salva os MP3 em `Music/FologneMusic`. [Como compilar com suporte a downloads](docs/desenvolvimento.md#protótipo-de-download-de-áudio).
+A aba mostra a fila, o progresso e o histórico local, com opções para cancelar, tentar novamente e reproduzir os arquivos concluídos. A conversão acontece no celular e salva os MP3 em `Music/FologneMusic`. Quando as notificações estão autorizadas, o app avisa ao concluir e o aviso abre a aba **Downloads**. [Como compilar com suporte a downloads](docs/desenvolvimento.md#protótipo-de-download-de-áudio).
 
 ## Letras e significados
 

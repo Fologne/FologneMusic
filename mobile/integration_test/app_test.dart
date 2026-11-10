@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:music_app/main.dart' as app;
 import 'package:music_app/features/library_screen.dart';
+import 'package:music_app/l10n/localization.dart';
 import 'package:music_app/library/music_controller.dart';
 import 'package:music_app/library/music_store.dart';
 import 'package:music_app/library/media_library.dart';
@@ -51,7 +52,10 @@ void main() {
     await state.toggleShuffle();
     final shuffled = state.playbackQueue.map((track) => track.id).toList();
     expect(shuffled.first, state.current!.id);
-    await state.skip(1);
+    await state.seek(state.duration - .5);
+    for (var i = 0; i < 15 && state.current?.id == shuffled.first; i++) {
+      await tester.pump(const Duration(milliseconds: 200));
+    }
     expect(state.current!.id, shuffled[1]);
     final expectedRepeat = (state.repeat + 1) % 3;
     await state.cycleRepeat();
@@ -94,6 +98,7 @@ void main() {
     expect(restored.favorites, contains(tracks.first.id));
     expect(restored.playbackQueue.map((track) => track.id), reordered);
     debugPrint('Sessão restaurada');
+    await restored.setLanguage(AppLanguage.pt);
     await tester.pumpWidget(app.MusicApp(controller: restored));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('open-player')));
